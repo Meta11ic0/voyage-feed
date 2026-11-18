@@ -3,11 +3,14 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"flag"
 	"fmt"
 	"io"
 	"math"
 	"net/http"
+	"os"
+	"runtime"
 	"sort"
 	"strconv"
 	"strings"
@@ -16,6 +19,11 @@ import (
 
 	"github.com/coder/websocket"
 )
+
+var errScaleFirst = errors.New("压测首条序号不连续")
+var errScaleMillis = errors.New("generated_at 缺少毫秒")
+
+var scaleTables = []string{"market_events", "bars_1m", "instrument_states", "instruments"}
 
 func verifyCommand(args []string, stderr io.Writer) int {
 	fs := flag.NewFlagSet("verify", flag.ContinueOnError)
@@ -62,22 +70,22 @@ func verifyReady(base string, stderr io.Writer) int {
 }
 
 func verifySmoke(base, market string, stderr io.Writer) int {
-	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
+	return verifySmokeWithin(base, market, stderr, 20*time.Second)
+}
+
+func verifySmokeWithin(base, market string, stderr io.Writer, budget time.Duration) int {
+	ctx, cancel := context.WithTimeout(context.Background(), budget)
 	defer cancel()
-	deadline := time.Now().Add(20 * time.Second)
-	for time.Now().Before(deadline) {
+	deadline := time.Now().Add(budget)
+	for {
 		if verifyReady(base, io.Discard) == 0 {
 			break
 		}
-		if time.Now().After(deadline) {
+		if time.Now().After(deadline) || ctx.Err() != nil {
 			fmt.Fprintln(stderr, "smoke 等待就绪超时。")
 			return 1
 		}
-		time.Sleep(50 * time.Millisecond)
-	}
-	if verifyReady(base, io.Discard) != 0 {
-		fmt.Fprintln(stderr, "smoke 等待就绪超时。")
-		return 1
+		time.Sleep(20 * time.Millisecond)
 	}
 	first, err := getJSON(ctx, base+"/v1/markets/"+market+"/status")
 	if err != nil {
@@ -85,18 +93,23 @@ func verifySmoke(base, market string, stderr io.Writer) int {
 		return 1
 	}
 	startSeq := asString(first["last_event_seq"])
+	startTick := asString(first["logical_tick"])
 	var status map[string]any
 	for {
 		status, err = getJSON(ctx, base+"/v1/markets/"+market+"/status")
 		if err != nil {
+			if ctx.Err() != nil {
+				fmt.Fprintln(stderr, "水位没有同时上涨。")
+				return 1
+			}
 			fmt.Fprintln(stderr, "status 读取失败。")
 			return 1
 		}
-		if asString(status["last_event_seq"]) != startSeq || asString(status["logical_tick"]) != asString(first["logical_tick"]) {
+		if asString(status["last_event_seq"]) != startSeq && asString(status["logical_tick"]) != startTick {
 			break
 		}
 		if ctx.Err() != nil {
-			fmt.Fprintln(stderr, "成交水位没有上涨。")
+			fmt.Fprintln(stderr, "水位没有同时上涨。")
 			return 1
 		}
 		time.Sleep(20 * time.Millisecond)
@@ -137,25 +150,48 @@ func verifySmoke(base, market string, stderr io.Writer) int {
 		fmt.Fprintln(stderr, "实时事件不足。")
 		return 1
 	}
+	asOfN, asErr := strconv.ParseInt(asOf, 10, 64)
+	firstN, firstErr := strconv.ParseInt(asString(events[0]["event_seq"]), 10, 64)
+	if asErr != nil || firstErr != nil || firstN != asOfN+1 {
+		fmt.Fprintln(stderr, "快照后首条序号不连续。")
+		return 1
+	}
+	for i := 1; i < len(events); i++ {
+		prev, errPrev := strconv.ParseInt(asString(events[i-1]["event_seq"]), 10, 64)
+		cur, errCur := strconv.ParseInt(asString(events[i]["event_seq"]), 10, 64)
+		if errPrev != nil || errCur != nil || cur != prev+1 {
+			fmt.Fprintln(stderr, "实时事件序号不连续。")
+			return 1
+		}
+	}
 	last := events[len(events)-1]
+	lastN, _ := strconv.ParseInt(asString(last["event_seq"]), 10, 64)
 	againURL := strings.Replace(base, "http", "ws", 1) + "/v1/stream?market_id=" + market + "&after_seq=" + asString(last["event_seq"])
 	conn, _, err = websocket.Dial(ctx, againURL, nil)
 	if err != nil {
 		fmt.Fprintln(stderr, "重连失败。")
 		return 1
 	}
+	defer conn.CloseNow()
 	more, err := readBusiness(ctx, conn, 1)
-	conn.CloseNow()
 	if err != nil || len(more) == 0 {
 		fmt.Fprintln(stderr, "重连没有补到事件。")
 		return 1
 	}
+	gotN, gotErr := strconv.ParseInt(asString(more[0]["event_seq"]), 10, 64)
+	if gotErr != nil || gotN != lastN+1 {
+		fmt.Fprintln(stderr, "重连首条序号不连续。")
+		return 1
+	}
 	want := more[0]
-	for _, item := range more {
-		if item["type"] == "trade" {
-			want = item
-			break
+	for want["type"] != "trade" {
+		extra, err := readBusiness(ctx, conn, 1)
+		if err != nil || len(extra) == 0 || len(more) >= 20 {
+			fmt.Fprintln(stderr, "重连没有读到成交。")
+			return 1
 		}
+		more = append(more, extra[0])
+		want = extra[0]
 	}
 	seq := asString(want["event_seq"])
 	prev, _ := strconv.ParseInt(seq, 10, 64)
@@ -168,32 +204,96 @@ func verifySmoke(base, market string, stderr io.Writer) int {
 		fmt.Fprintln(stderr, "重连事件与 REST 不一致。")
 		return 1
 	}
+	if !millisStamp(asString(want["generated_at"])) {
+		fmt.Fprintln(stderr, "generated_at 小数不足三位。")
+		return 1
+	}
+	fmt.Fprintf(stderr, "smoke 通过 tick=%s seq=%s 首条=%s 重连=%d 对照=trade\n", asString(status["logical_tick"]), asString(status["last_event_seq"]), asString(events[0]["event_seq"]), gotN)
 	return 0
 }
 
+type scaleOptions struct {
+	window  time.Duration
+	clients int
+	catch   time.Duration
+}
+
 func verifyScale(base, market string, stderr io.Writer) int {
-	ctx, cancel := context.WithTimeout(context.Background(), 80*time.Second)
+	return verifyScaleRun(base, market, stderr, scaleOptions{window: 60 * time.Second, clients: 10, catch: 5 * time.Second})
+}
+
+func verifyScaleRun(base, market string, stderr io.Writer, opt scaleOptions) int {
+	if opt.window <= 0 {
+		opt.window = 60 * time.Second
+	}
+	if opt.clients <= 0 {
+		opt.clients = 10
+	}
+	if opt.catch <= 0 {
+		opt.catch = 5 * time.Second
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), opt.window+opt.catch+15*time.Second)
 	defer cancel()
 	if verifyReady(base, stderr) != 0 {
 		return 1
 	}
+	fmt.Fprintf(stderr, "scale 硬件 %s\n", containerHardware())
 	status, err := getJSON(ctx, base+"/v1/markets/"+market+"/status")
 	if err != nil {
 		fmt.Fprintln(stderr, "status 读取失败。")
 		return 1
 	}
 	after := asString(status["last_event_seq"])
+	cursor, err := strconv.ParseInt(after, 10, 64)
+	if err != nil {
+		fmt.Fprintln(stderr, "status 序号无效。")
+		return 1
+	}
+	startBody, err := getText(ctx, base+"/metrics")
+	if err != nil {
+		fmt.Fprintln(stderr, "metrics 读取失败。")
+		return 1
+	}
+	startHist, ok := parseHist(startBody)
+	if !ok {
+		fmt.Fprintln(stderr, "写入直方图缺失。")
+		return 1
+	}
 	wsURL := strings.Replace(base, "http", "ws", 1) + "/v1/stream?market_id=" + market + "&after_seq=" + after
-	const clients = 10
 	type result struct {
 		seqs []int64
 		lags []float64
+		last int64
 		err  error
 	}
-	results := make([]result, clients)
+	results := make([]result, opt.clients)
 	var wg sync.WaitGroup
-	stop := time.Now().Add(60 * time.Second)
-	for i := 0; i < clients; i++ {
+	stop := time.Now().Add(opt.window)
+	var reqMu sync.Mutex
+	var samples []float64
+	var reqErr int
+	sampleCtx, sampleCancel := context.WithCancel(ctx)
+	go func() {
+		ticker := time.NewTicker(time.Second)
+		defer ticker.Stop()
+		for {
+			started := time.Now()
+			_, err := getJSON(sampleCtx, base+"/v1/markets/"+market+"/status")
+			reqMu.Lock()
+			if err != nil {
+				reqErr++
+			} else {
+				samples = append(samples, time.Since(started).Seconds())
+			}
+			reqMu.Unlock()
+			select {
+			case <-sampleCtx.Done():
+				return
+			case <-ticker.C:
+			}
+		}
+	}()
+	for i := 0; i < opt.clients; i++ {
 		wg.Add(1)
 		go func(i int) {
 			defer wg.Done()
@@ -203,6 +303,7 @@ func verifyScale(base, market string, stderr io.Writer) int {
 				return
 			}
 			defer conn.CloseNow()
+			first := true
 			for time.Now().Before(stop) {
 				readCtx, cancelRead := context.WithDeadline(ctx, stop)
 				_, payload, err := conn.Read(readCtx)
@@ -227,30 +328,54 @@ func verifyScale(base, market string, stderr io.Writer) int {
 					results[i].err = err
 					return
 				}
-				results[i].seqs = append(results[i].seqs, seq)
-				if stamp := asString(body["generated_at"]); stamp != "" {
-					when, err := time.Parse(time.RFC3339, stamp)
-					if err == nil {
-						lag := time.Since(when).Seconds()
-						if lag < 0 {
-							lag = 0
-						}
-						results[i].lags = append(results[i].lags, lag)
-					}
+				if first && seq != cursor+1 {
+					results[i].err = errScaleFirst
+					return
 				}
+				first = false
+				results[i].seqs = append(results[i].seqs, seq)
+				results[i].last = seq
+				stamp := asString(body["generated_at"])
+				if !millisStamp(stamp) {
+					results[i].err = errScaleMillis
+					return
+				}
+				when, err := time.Parse(time.RFC3339Nano, stamp)
+				if err != nil {
+					results[i].err = err
+					return
+				}
+				lag := time.Since(when).Seconds()
+				if lag < 0 {
+					lag = 0
+				}
+				results[i].lags = append(results[i].lags, lag)
 			}
 		}(i)
 	}
 	wg.Wait()
+	sampleCancel()
 	var lags []float64
 	var total int
 	for i, item := range results {
+		if errors.Is(item.err, errScaleFirst) {
+			fmt.Fprintln(stderr, "压测首条序号不连续。")
+			return 1
+		}
+		if errors.Is(item.err, errScaleMillis) {
+			fmt.Fprintln(stderr, "generated_at 缺少毫秒。")
+			return 1
+		}
 		if item.err != nil {
 			fmt.Fprintf(stderr, "订阅 %d 失败。\n", i+1)
 			return 1
 		}
 		if len(item.seqs) == 0 {
 			fmt.Fprintln(stderr, "压测期间没有事件。")
+			return 1
+		}
+		if item.seqs[0] != cursor+1 {
+			fmt.Fprintln(stderr, "压测首条序号不连续。")
 			return 1
 		}
 		for j := 1; j < len(item.seqs); j++ {
@@ -262,14 +387,47 @@ func verifyScale(base, market string, stderr io.Writer) int {
 		lags = append(lags, item.lags...)
 		total += len(item.seqs)
 	}
-	caught := false
-	var committed, dispatched int64
-	deadline := time.Now().Add(5 * time.Second)
-	var writeP95 float64
-	for {
+	endBody, err := getText(ctx, base+"/metrics")
+	if err != nil {
+		fmt.Fprintln(stderr, "metrics 读取失败。")
+		return 1
+	}
+	committed, dispatched := gaugePair(endBody)
+	for i, item := range results {
+		fmt.Fprintf(stderr, "scale 客户端 %d 水位差=%d\n", i+1, committed-item.last)
+	}
+	sizes := parseTableBytes(endBody)
+	for _, name := range scaleTables {
+		value, found := sizes[name]
+		if !found {
+			fmt.Fprintf(stderr, "表体积指标缺失。\n")
+			return 1
+		}
+		fmt.Fprintf(stderr, "scale 表 %s 字节=%d\n", name, value)
+	}
+	endHist, ok := parseHist(endBody)
+	if !ok {
+		fmt.Fprintln(stderr, "写入直方图缺失。")
+		return 1
+	}
+	writeP95, _, kind := histWindow(startHist, endHist)
+	switch kind {
+	case "restart":
+		fmt.Fprintln(stderr, "窗口内重启。")
+		return 1
+	case "empty":
+		fmt.Fprintln(stderr, "窗口内无提交。")
+		return 1
+	case "missing":
+		fmt.Fprintln(stderr, "写入直方图缺失。")
+		return 1
+	}
+	caught := dispatched >= committed
+	deadline := time.Now().Add(opt.catch)
+	for !caught {
 		body, err := getText(ctx, base+"/metrics")
 		if err == nil {
-			committed, dispatched, writeP95 = scaleMetrics(body)
+			committed, dispatched = gaugePair(body)
 			if dispatched >= committed {
 				caught = true
 				break
@@ -280,8 +438,13 @@ func verifyScale(base, market string, stderr io.Writer) int {
 		}
 		time.Sleep(200 * time.Millisecond)
 	}
+	reqMu.Lock()
+	reqP95 := percentile(samples, 0.95)
+	reqN := len(samples)
+	reqFailed := reqErr
+	reqMu.Unlock()
 	receiveP95 := percentile(lags, 0.95)
-	fmt.Fprintf(stderr, "scale 订阅=10 秒=60 事件=%d 写入p95上限=%.3fs 收到p95=%.3fs 已提交=%d 已发送=%d\n", total/clients, writeP95, receiveP95, committed, dispatched)
+	fmt.Fprintf(stderr, "scale 订阅=%d 秒=%.0f 事件=%d 请求样本=%d 请求错误=%d 请求p95=%.3fs 写入p95上限=%.3fs 收到p95=%.3fs 已提交=%d 已发送=%d\n", opt.clients, opt.window.Seconds(), total/opt.clients, reqN, reqFailed, reqP95, writeP95, receiveP95, committed, dispatched)
 	if !caught {
 		fmt.Fprintln(stderr, "结束后 5 秒内没有追平。")
 		return 1
@@ -294,7 +457,145 @@ func verifyScale(base, market string, stderr io.Writer) int {
 		fmt.Fprintln(stderr, "收到事件 p95 达到 1 秒。")
 		return 1
 	}
+	if reqN == 0 || math.IsNaN(reqP95) || math.IsInf(reqP95, 0) {
+		fmt.Fprintln(stderr, "请求样本为空或请求 p95 不是有限数。")
+		return 1
+	}
 	return 0
+}
+
+func containerHardware() string {
+	mem := "unknown"
+	if raw, err := os.ReadFile("/proc/meminfo"); err == nil {
+		for _, line := range strings.Split(string(raw), "\n") {
+			if strings.HasPrefix(line, "MemTotal:") {
+				mem = strings.TrimSpace(strings.TrimPrefix(line, "MemTotal:"))
+				break
+			}
+		}
+	}
+	cgroup := "unknown"
+	for _, path := range []string{"/sys/fs/cgroup/memory.max", "/sys/fs/cgroup/memory/memory.limit_in_bytes"} {
+		raw, err := os.ReadFile(path)
+		if err != nil {
+			continue
+		}
+		cgroup = strings.TrimSpace(string(raw))
+		break
+	}
+	return fmt.Sprintf("视角=容器 nproc=%d mem_total=%s cgroup_memory=%s", runtime.NumCPU(), mem, cgroup)
+}
+
+type histSnap struct {
+	bounds []float64
+	counts []uint64
+}
+
+func parseHist(body string) (histSnap, bool) {
+	var snap histSnap
+	for _, line := range strings.Split(body, "\n") {
+		if !strings.HasPrefix(line, "market_tick_commit_seconds_bucket{le=\"") {
+			continue
+		}
+		rest := strings.TrimPrefix(line, "market_tick_commit_seconds_bucket{le=\"")
+		parts := strings.SplitN(rest, "\"} ", 2)
+		if len(parts) != 2 {
+			continue
+		}
+		var bound float64
+		if parts[0] == "+Inf" {
+			bound = math.Inf(1)
+		} else {
+			parsed, err := strconv.ParseFloat(parts[0], 64)
+			if err != nil {
+				continue
+			}
+			bound = parsed
+		}
+		count, err := strconv.ParseUint(strings.TrimSpace(parts[1]), 10, 64)
+		if err != nil {
+			continue
+		}
+		snap.bounds = append(snap.bounds, bound)
+		snap.counts = append(snap.counts, count)
+	}
+	return snap, len(snap.counts) > 0
+}
+
+func histWindow(start, end histSnap) (p95 float64, total uint64, kind string) {
+	if len(start.counts) == 0 || len(start.counts) != len(end.counts) {
+		return math.Inf(1), 0, "missing"
+	}
+	delta := make([]uint64, len(end.counts))
+	for i := range end.counts {
+		if end.counts[i] < start.counts[i] {
+			return 0, 0, "restart"
+		}
+		delta[i] = end.counts[i] - start.counts[i]
+		if i > 0 && delta[i] < delta[i-1] {
+			return 0, 0, "restart"
+		}
+	}
+	total = delta[len(delta)-1]
+	if total == 0 {
+		return 0, 0, "empty"
+	}
+	need := 0.95 * float64(total)
+	p95 = math.Inf(1)
+	for i, count := range delta {
+		if float64(count) >= need {
+			return end.bounds[i], total, "ok"
+		}
+	}
+	return p95, total, "ok"
+}
+
+func gaugePair(body string) (committed, dispatched int64) {
+	for _, line := range strings.Split(body, "\n") {
+		switch {
+		case strings.HasPrefix(line, "market_event_last_committed "):
+			committed, _ = strconv.ParseInt(strings.TrimSpace(strings.TrimPrefix(line, "market_event_last_committed ")), 10, 64)
+		case strings.HasPrefix(line, "market_event_last_dispatched "):
+			dispatched, _ = strconv.ParseInt(strings.TrimSpace(strings.TrimPrefix(line, "market_event_last_dispatched ")), 10, 64)
+		}
+	}
+	return committed, dispatched
+}
+
+func parseTableBytes(body string) map[string]int64 {
+	out := map[string]int64{}
+	const prefix = "market_db_table_bytes{table=\""
+	for _, line := range strings.Split(body, "\n") {
+		if !strings.HasPrefix(line, prefix) {
+			continue
+		}
+		rest := strings.TrimPrefix(line, prefix)
+		parts := strings.SplitN(rest, "\"} ", 2)
+		if len(parts) != 2 {
+			continue
+		}
+		value, err := strconv.ParseInt(strings.TrimSpace(parts[1]), 10, 64)
+		if err != nil {
+			continue
+		}
+		out[parts[0]] = value
+	}
+	return out
+}
+
+func millisStamp(stamp string) bool {
+	dot := strings.LastIndex(stamp, ".")
+	if dot < 0 || dot+1 >= len(stamp) {
+		return false
+	}
+	n := 0
+	for _, c := range stamp[dot+1:] {
+		if c < '0' || c > '9' {
+			break
+		}
+		n++
+	}
+	return n >= 3
 }
 
 func getText(ctx context.Context, url string) (string, error) {
@@ -312,35 +613,6 @@ func getText(ctx context.Context, url string) (string, error) {
 	}
 	body, err := io.ReadAll(resp.Body)
 	return string(body), err
-}
-
-func scaleMetrics(body string) (committed, dispatched int64, writeP95 float64) {
-	var total uint64
-	writeP95 = math.Inf(1)
-	for _, line := range strings.Split(body, "\n") {
-		if strings.HasPrefix(line, "market_tick_commit_seconds_bucket{le=\"+Inf\"} ") {
-			total, _ = strconv.ParseUint(strings.TrimPrefix(line, "market_tick_commit_seconds_bucket{le=\"+Inf\"} "), 10, 64)
-		}
-	}
-	need := 0.95 * float64(total)
-	for _, line := range strings.Split(body, "\n") {
-		switch {
-		case strings.HasPrefix(line, "market_event_last_committed "):
-			committed, _ = strconv.ParseInt(strings.TrimPrefix(line, "market_event_last_committed "), 10, 64)
-		case strings.HasPrefix(line, "market_event_last_dispatched "):
-			dispatched, _ = strconv.ParseInt(strings.TrimPrefix(line, "market_event_last_dispatched "), 10, 64)
-		case strings.HasPrefix(line, "market_tick_commit_seconds_bucket{le=\"") && !strings.Contains(line, "+Inf"):
-			parts := strings.SplitN(strings.TrimPrefix(line, "market_tick_commit_seconds_bucket{le=\""), "\"} ", 2)
-			if len(parts) != 2 {
-				continue
-			}
-			count, _ := strconv.ParseUint(parts[1], 10, 64)
-			if writeP95 == math.Inf(1) && float64(count) >= need && need > 0 {
-				writeP95, _ = strconv.ParseFloat(parts[0], 64)
-			}
-		}
-	}
-	return committed, dispatched, writeP95
 }
 
 func percentile(values []float64, p float64) float64 {
@@ -424,7 +696,10 @@ func sameEvent(left, right map[string]any) bool {
 	if left == nil || right == nil {
 		return false
 	}
-	for _, key := range []string{"event_seq", "type", "symbol", "price_cents", "quantity"} {
+	for _, key := range []string{
+		"market_id", "event_seq", "type", "symbol", "logical_tick", "market_date",
+		"event_time", "generated_at", "price_cents", "quantity", "turnover_cents",
+	} {
 		if asString(left[key]) != asString(right[key]) {
 			return false
 		}

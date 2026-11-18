@@ -12,6 +12,8 @@ COPY data/scale.json ./data/scale.json
 RUN CGO_ENABLED=0 go build -o /out/market-simulator ./cmd/market-simulator
 
 FROM build AS test
+COPY data/dev-src ./data/dev-src
+COPY data/dev.report.json ./data/dev.report.json
 RUN go vet ./... && go test -race ./...
 
 FROM debian:bookworm-slim AS runtime

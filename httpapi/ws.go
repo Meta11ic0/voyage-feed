@@ -13,6 +13,10 @@ import (
 )
 
 func (s *Server) stream(w http.ResponseWriter, r *http.Request) {
+	if s.ShuttingDown() {
+		writeError(w, http.StatusServiceUnavailable, "shutting_down", "服务正在停止", nil)
+		return
+	}
 	query := r.URL.Query()
 	if query.Get("market_id") != s.MarketID {
 		writeError(w, http.StatusNotFound, "not_found", "市场不存在", nil)

@@ -52,7 +52,7 @@ func TestStreamPrepareStatuses(t *testing.T) {
 
 	// 等水位越过 2500：409 用例要回退 2000，缺口必须稳定超过 1024。
 	high := int64(0)
-	deadline := time.Now().Add(10 * time.Second)
+	deadline := time.Now().Add(20 * time.Second)
 	for time.Now().Before(deadline) {
 		if high = streamStatusNumber(t, svc.URL, "last_event_seq"); high > 2500 {
 			break

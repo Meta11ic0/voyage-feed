@@ -33,6 +33,7 @@ services:
       MAX_STREAM_CLIENTS: "64"
     ports:
       - "127.0.0.1:8788:8787"
+    stop_grace_period: 15s
     depends_on:
       db:
         condition: service_healthy

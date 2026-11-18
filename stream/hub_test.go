@@ -270,37 +270,52 @@ func TestKickRecoveryReplayCoversGap(t *testing.T) {
 	contiguous(t, combined, 99, 105)
 }
 
-// PrepareSnapshot 为 nil 时回退 Watermark+Fetch 旧路径，状态码行为不回归。
-func TestPrepareLegacyFallbackAndStatuses(t *testing.T) {
+// 状态码由注入的 PrepareSnapshot 决定，不再走 Watermark+Fetch 两次读取。
+func TestPrepareSnapshotStatuses(t *testing.T) {
 	ctx := context.Background()
 	hub := NewHub()
-	hub.Watermark = func(context.Context) (int64, int64, error) { return 100, 1, nil }
-	hub.Fetch = func(_ context.Context, after, until int64, limit int) ([]Message, error) {
-		return seqMsgs(after+1, until), nil
+	if err := hub.Validate(); err == nil {
+		t.Fatal("未配置 PrepareSnapshot 时应拒绝启动")
+	}
+	missing := hub.Prepare(ctx, 0)
+	if missing.Status != 503 || missing.Err == nil {
+		t.Fatalf("nil PrepareSnapshot 应失败，得到 %d/%v", missing.Status, missing.Err)
+	}
+	hub.PrepareSnapshot = func(context.Context, int64, int) (int64, int64, []Message, error) {
+		return 100, 1, seqMsgs(100, 100), nil
+	}
+	if err := hub.Validate(); err != nil {
+		t.Fatal(err)
 	}
 	ok := hub.Prepare(ctx, 99)
 	if ok.Status != 0 || len(ok.Replay) != 1 || ok.Replay[0].Seq != 100 {
-		t.Fatalf("回退路径 Prepare 异常：%+v", ok)
+		t.Fatalf("Prepare 异常：%+v", ok)
 	}
 	hub.Release(ok.Sub)
+	hub.PrepareSnapshot = func(context.Context, int64, int) (int64, int64, []Message, error) {
+		return 100, 1, nil, nil
+	}
 	bad := hub.Prepare(ctx, 101)
 	if bad.Status != 400 {
 		t.Fatalf("期望 400，得到 %d", bad.Status)
 	}
-	hub.Watermark = func(context.Context) (int64, int64, error) { return 100, 50, nil }
+	hub.PrepareSnapshot = func(context.Context, int64, int) (int64, int64, []Message, error) {
+		return 100, 50, nil, nil
+	}
 	gone := hub.Prepare(ctx, 10)
 	if gone.Status != 410 || gone.Retained != 50 {
 		t.Fatalf("期望 410 且 Retained=50，得到 %d/%d", gone.Status, gone.Retained)
 	}
-	hub.Watermark = func(context.Context) (int64, int64, error) { return 100, 1, nil }
-	hub.Fetch = func(_ context.Context, after, until int64, limit int) ([]Message, error) {
-		return seqMsgs(after+1, after+int64(limit)), nil
+	hub.PrepareSnapshot = func(_ context.Context, after int64, limit int) (int64, int64, []Message, error) {
+		return after + int64(limit), 1, seqMsgs(after+1, after+int64(limit)), nil
 	}
 	big := hub.Prepare(ctx, 0)
 	if big.Status != 409 {
 		t.Fatalf("期望 409，得到 %d", big.Status)
 	}
-	hub.Watermark = func(context.Context) (int64, int64, error) { return 0, 0, errors.New("db down") }
+	hub.PrepareSnapshot = func(context.Context, int64, int) (int64, int64, []Message, error) {
+		return 0, 0, nil, errors.New("db down")
+	}
 	unavailable := hub.Prepare(ctx, 0)
 	if unavailable.Status != 503 || unavailable.Err == nil {
 		t.Fatalf("期望 503 带错误，得到 %d/%v", unavailable.Status, unavailable.Err)

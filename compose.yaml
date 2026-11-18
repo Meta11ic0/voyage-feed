@@ -33,6 +33,7 @@ services:
       MAX_STREAM_CLIENTS: "64"
     ports:
       - "127.0.0.1:8787:8787"
+    stop_grace_period: 15s
     depends_on:
       db:
         condition: service_healthy
@@ -43,5 +44,38 @@ services:
       retries: 20
       start_period: 15s
 
+  test-db:
+    profiles: ["test"]
+    image: postgres:17
+    environment:
+      POSTGRES_USER: voyage
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-voyage-dev}
+      POSTGRES_DB: voyage_test
+    volumes:
+      - test-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U voyage -d voyage_test"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+      start_period: 10s
+
+  integration:
+    profiles: ["test"]
+    build:
+      context: .
+      target: test
+    working_dir: /src
+    environment:
+      GOPROXY: "off"
+      DATABASE_URL: postgres://voyage:${POSTGRES_PASSWORD:-voyage-dev}@test-db:5432/voyage_test?sslmode=disable
+      ADMIN_DATABASE_URL: postgres://voyage:${POSTGRES_PASSWORD:-voyage-dev}@test-db:5432/postgres?sslmode=disable
+    depends_on:
+      test-db:
+        condition: service_healthy
+    restart: "no"
+    command: ["bash", "-lc", "set -euo pipefail; go test -race -count=1 -tags=integration ./store/; go test -race -count=1 -tags=integration ./cmd/market-simulator/ ./dataset/ ./engine/ ./httpapi/ ./stream/"]
+
 volumes:
   db-data:
+  test-db-data:

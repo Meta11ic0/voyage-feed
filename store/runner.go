@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log/slog"
+	"regexp"
 	"strings"
 	"sync"
 	"time"
@@ -11,23 +13,30 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
+// dsnUserinfo 匹配 scheme://user:password@，日志里换成 scheme://redacted@。
+var dsnUserinfo = regexp.MustCompile(`([a-zA-Z][a-zA-Z0-9+.-]*://)[^/\s:@]+:[^@\s/]+@`)
+
 type Runner struct {
-	MarketID       string
-	Interval       time.Duration
-	RetentionDays  int
-	Hooks          Hooks
-	Notify         chan struct{}
-	Open           func(context.Context) (*pgx.Conn, error)
-	Dial           func(context.Context) (*pgx.Conn, error)
-	OnLock         func()
-	OnStop         func()
-	OnDBError      func(error)
-	OnCommit       func(StepResult, time.Duration)
-	Now            func() time.Time
-	Sleep          func(context.Context, time.Duration)
-	mu             sync.Mutex
-	maintaining    bool
-	maintainFailed error
+	MarketID        string
+	Interval        time.Duration
+	RetentionDays   int
+	Hooks           Hooks
+	Notify          chan struct{}
+	Open            func(context.Context) (*pgx.Conn, error)
+	Dial            func(context.Context) (*pgx.Conn, error)
+	OnLock          func()
+	OnStop          func()
+	OnDBError       func(error)
+	OnCommit        func(StepResult, time.Duration)
+	OnMaintainError func(phase string, err error)
+	Log             *slog.Logger
+	Now             func() time.Time
+	Sleep           func(context.Context, time.Duration)
+	// maintainFunc 仅测试替换 Maintain。生产为空，走真实清理。
+	maintainFunc func(context.Context, *pgx.Conn) error
+	mu           sync.Mutex
+	maintaining  bool
+	maintainDone chan struct{}
 }
 
 func (r *Runner) Run(ctx context.Context, conn *pgx.Conn) error {
@@ -43,18 +52,24 @@ func (r *Runner) Run(ctx context.Context, conn *pgx.Conn) error {
 	if r.RetentionDays <= 0 {
 		r.RetentionDays = 7
 	}
+	defer r.waitMaintain()
 	key, err := lockMarket(ctx, conn, r.MarketID)
 	if err != nil {
 		return err
 	}
 	held := conn
+	var previous *pgx.Conn
 	if r.OnLock != nil {
 		r.OnLock()
 	}
 	defer func() {
 		if held != nil {
-			held.Exec(context.Background(), `SELECT pg_advisory_unlock($1)`, key)
+			r.releaseLock(held, key)
 			held = nil
+		}
+		if previous != nil {
+			previous.Close(context.Background())
+			previous = nil
 		}
 		if r.OnStop != nil {
 			r.OnStop()
@@ -80,6 +95,10 @@ func (r *Runner) Run(ctx context.Context, conn *pgx.Conn) error {
 			key, lockErr = lockMarket(ctx, next, r.MarketID)
 			if lockErr != nil {
 				next.Close(context.Background())
+				if previous != nil {
+					previous.Close(context.Background())
+					previous = nil
+				}
 				if strings.Contains(lockErr.Error(), "同市场已经启动") {
 					return lockErr
 				}
@@ -87,6 +106,10 @@ func (r *Runner) Run(ctx context.Context, conn *pgx.Conn) error {
 				r.Sleep(ctx, backoff)
 				backoff = nextBackoff(backoff)
 				continue
+			}
+			if previous != nil {
+				previous.Close(context.Background())
+				previous = nil
 			}
 			held = next
 			if r.OnLock != nil {
@@ -102,8 +125,12 @@ func (r *Runner) Run(ctx context.Context, conn *pgx.Conn) error {
 				return err
 			}
 			if r.Dial != nil {
-				held.Exec(context.Background(), `SELECT pg_advisory_unlock($1)`, key)
-				held.Close(context.Background())
+				r.releaseLock(held, key)
+				previous = held
+				previous.Close(context.Background())
+				if previous.IsClosed() {
+					previous = nil
+				}
 				held = nil
 				r.noteDB(err)
 			}
@@ -130,6 +157,36 @@ func (r *Runner) Run(ctx context.Context, conn *pgx.Conn) error {
 			r.Sleep(ctx, wait)
 		}
 	}
+}
+
+// releaseLock 释放本会话的写锁。调用失败或库返回未释放时记一条日志，不写连接串。
+func (r *Runner) releaseLock(conn *pgx.Conn, key int64) {
+	if conn == nil {
+		return
+	}
+	var released bool
+	err := conn.QueryRow(context.Background(), `SELECT pg_advisory_unlock($1)`, key).Scan(&released)
+	if err == nil && released {
+		return
+	}
+	logger := r.Log
+	if logger == nil {
+		logger = slog.Default()
+	}
+	detail := "未持有该写锁"
+	if err != nil {
+		detail = unlockDetail(err)
+	}
+	logger.Error("释放写锁失败", "market_id", r.MarketID, "err", detail)
+}
+
+func unlockDetail(err error) string {
+	text := redactSecrets(err.Error())
+	lower := strings.ToLower(text)
+	if strings.Contains(text, "://") || strings.Contains(lower, "password=") || strings.Contains(lower, "postgres://") {
+		return "数据库错误已省略连接信息"
+	}
+	return text
 }
 
 func (r *Runner) noteDB(err error) {
@@ -174,6 +231,7 @@ func (r *Runner) startMaintain(ctx context.Context) {
 		return
 	}
 	r.maintaining = true
+	r.maintainDone = make(chan struct{})
 	r.mu.Unlock()
 	go r.maintain(ctx)
 }
@@ -182,17 +240,61 @@ func (r *Runner) maintain(ctx context.Context) {
 	defer func() {
 		r.mu.Lock()
 		r.maintaining = false
+		done := r.maintainDone
 		r.mu.Unlock()
+		if done != nil {
+			close(done)
+		}
 	}()
 	conn, err := r.Open(ctx)
 	if err != nil {
-		r.maintainFailed = err
+		r.noteMaintain(ctx, "open", err)
 		return
 	}
-	defer conn.Close(ctx)
-	if err := Maintain(ctx, conn, r.MarketID, r.RetentionDays); err != nil {
-		r.maintainFailed = err
+	if conn != nil {
+		defer conn.Close(context.Background())
 	}
+	fn := r.maintainFunc
+	if fn == nil {
+		fn = func(callCtx context.Context, held *pgx.Conn) error {
+			return Maintain(callCtx, held, r.MarketID, r.RetentionDays)
+		}
+	}
+	if err := fn(ctx, conn); err != nil {
+		r.noteMaintain(ctx, "maintain", err)
+	}
+}
+
+// waitMaintain 让 Run 在返回前等在途清理结束，使 OnMaintainError 能在进程退出前落盘。
+// 停机方另有 10 秒硬上限，这里不再套第二段超时。
+func (r *Runner) waitMaintain() {
+	r.mu.Lock()
+	running := r.maintaining
+	done := r.maintainDone
+	r.mu.Unlock()
+	if !running || done == nil {
+		return
+	}
+	<-done
+}
+
+func (r *Runner) noteMaintain(ctx context.Context, phase string, err error) {
+	if err == nil || ctx.Err() != nil {
+		return
+	}
+	safe := errors.New(redactSecrets(err.Error()))
+	logger := r.Log
+	if logger == nil {
+		logger = slog.Default()
+	}
+	logger.Error("保留期维护失败", "market_id", r.MarketID, "phase", phase, "err", safe.Error())
+	if r.OnMaintainError != nil {
+		r.OnMaintainError(phase, safe)
+	}
+}
+
+func redactSecrets(text string) string {
+	return dsnUserinfo.ReplaceAllString(text, "${1}redacted@")
 }
 
 func sleepCtx(ctx context.Context, d time.Duration) {

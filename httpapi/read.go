@@ -510,7 +510,7 @@ func (s *Server) readEvents(ctx context.Context, tx pgx.Tx, after, until int64, 
 		body := map[string]any{
 			"schema_version": 1, "market_id": s.MarketID, "event_seq": num(seq), "type": kind,
 			"logical_tick": num(tick), "market_date": day,
-			"event_time": when.UTC().Format(time.RFC3339), "generated_at": generated.UTC().Format(time.RFC3339),
+			"event_time": when.UTC().Format(time.RFC3339), "generated_at": formatGeneratedAt(generated),
 		}
 		if kind == "trade" && symbol != nil && priceN != nil && qtyN != nil && turnN != nil {
 			body["symbol"] = *symbol
@@ -525,6 +525,11 @@ func (s *Server) readEvents(ctx context.Context, tx pgx.Tx, after, until int64, 
 		out = append(out, stream.Message{Seq: seq, Body: raw})
 	}
 	return out, rows.Err()
+}
+
+// formatGeneratedAt 固定三位小数，REST 与 WebSocket 都从 readEvents 这一处写出。
+func formatGeneratedAt(t time.Time) string {
+	return t.UTC().Format("2006-01-02T15:04:05.000Z07:00")
 }
 
 func (s *Server) Fetch(ctx context.Context, after, until int64, limit int) ([]stream.Message, error) {

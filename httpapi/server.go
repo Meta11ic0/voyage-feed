@@ -25,6 +25,7 @@ type Server struct {
 	Log        *slog.Logger
 	mu         sync.Mutex
 	lockHeld   bool
+	shutting   bool
 	lastCommit time.Time
 	lastSeq    int64
 	lastTick   int64
@@ -34,6 +35,7 @@ type Server struct {
 	inf        uint64
 	sum        float64
 	count      uint64
+	tables     tableByteCache
 }
 
 func (s *Server) Locked() bool {
@@ -46,6 +48,18 @@ func (s *Server) SetLocked(held bool) {
 	s.mu.Lock()
 	s.lockHeld = held
 	s.mu.Unlock()
+}
+
+func (s *Server) SetShuttingDown(down bool) {
+	s.mu.Lock()
+	s.shutting = down
+	s.mu.Unlock()
+}
+
+func (s *Server) ShuttingDown() bool {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	return s.shutting
 }
 
 func (s *Server) Observe(seq, tick int64, elapsed time.Duration) {
@@ -110,7 +124,7 @@ func (s *Server) Handler() http.Handler {
 			s.readyz(w, r)
 			return
 		case "/metrics":
-			s.metrics(w)
+			s.metrics(w, r)
 			return
 		case "/v1/stream":
 			s.stream(w, r)

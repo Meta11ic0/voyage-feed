@@ -2,6 +2,7 @@ package stream
 
 import (
 	"context"
+	"errors"
 	"sync"
 	"time"
 )
@@ -26,16 +27,16 @@ type Hub struct {
 	Fetch     func(ctx context.Context, after, until int64, limit int) ([]Message, error)
 	Watermark func(ctx context.Context) (high, retained int64, err error)
 	// PrepareSnapshot 在同一只读快照内读取高水位、保留边界和补发事件，limit 传入
-	// 实际接收上限加一（多取一条用于判断缺口超限）。生产接线必须设置；为 nil 时
-	// Prepare 回退到 Watermark 与 Fetch 两次读取，仅用于测试和过渡。
+	// 实际接收上限加一（多取一条用于判断缺口超限）。生产接线必须设置。
+	// 未设置时 Validate 拒绝启动，Prepare 直接失败，不再回退到两次读取。
 	PrepareSnapshot func(ctx context.Context, after int64, limit int) (high, retained int64, msgs []Message, err error)
-	Notify    chan struct{}
-	OnDBError func()
-	OnSlow    func()
-	mu        sync.Mutex
-	subs      map[*Sub]struct{}
-	last      int64
-	started   bool
+	Notify          chan struct{}
+	OnDBError       func()
+	OnSlow          func()
+	mu              sync.Mutex
+	subs            map[*Sub]struct{}
+	last            int64
+	started         bool
 }
 
 // PrepareResult 是建连补发的结果：成功时 Status 为 0，Sub 与 Replay 可用；
@@ -51,6 +52,14 @@ type PrepareResult struct {
 
 func NewHub() *Hub {
 	return &Hub{subs: map[*Sub]struct{}{}, Notify: make(chan struct{}, 1)}
+}
+
+// Validate 在监听前调用。PrepareSnapshot 为空时拒绝启动。
+func (h *Hub) Validate() error {
+	if h == nil || h.PrepareSnapshot == nil {
+		return errors.New("PrepareSnapshot 未配置")
+	}
+	return nil
 }
 
 func (h *Hub) Clients() int {
@@ -74,20 +83,12 @@ func (h *Hub) Prepare(ctx context.Context, after int64) PrepareResult {
 		h.remove(item)
 		return PrepareResult{Status: status, Err: err}
 	}
-	var high, retained int64
-	var replay []Message
-	if h.PrepareSnapshot != nil {
-		var err error
-		high, retained, replay, err = h.PrepareSnapshot(ctx, after, QueueLimit+1)
-		if err != nil {
-			return fail(503, err)
-		}
-	} else {
-		var err error
-		high, retained, err = h.Watermark(ctx)
-		if err != nil {
-			return fail(503, err)
-		}
+	if h.PrepareSnapshot == nil {
+		return fail(503, errors.New("PrepareSnapshot 未配置"))
+	}
+	high, retained, replay, err := h.PrepareSnapshot(ctx, after, QueueLimit+1)
+	if err != nil {
+		return fail(503, err)
 	}
 	if after < retained-1 {
 		h.remove(item)
@@ -95,13 +96,6 @@ func (h *Hub) Prepare(ctx context.Context, after int64) PrepareResult {
 	}
 	if after > high {
 		return fail(400, nil)
-	}
-	if h.PrepareSnapshot == nil {
-		var err error
-		replay, err = h.Fetch(ctx, after, high, QueueLimit+1)
-		if err != nil {
-			return fail(503, err)
-		}
 	}
 	if len(replay) > QueueLimit {
 		return fail(409, nil)

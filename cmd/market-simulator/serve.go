@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log/slog"
 	"net"
 	"net/http"
 	"os"
@@ -170,6 +171,10 @@ func runServe(ctx context.Context, cfg serveConfig) (*service, error) {
 	hub.PrepareSnapshot = api.PrepareSnapshot
 	hub.OnDBError = api.NoteDBError
 	hub.OnSlow = api.NoteDisconnect
+	if err := hub.Validate(); err != nil {
+		pool.Close()
+		return nil, err
+	}
 	listener, err := net.Listen("tcp", cfg.HTTPAddr)
 	if err != nil {
 		pool.Close()
@@ -181,12 +186,22 @@ func runServe(ctx context.Context, cfg serveConfig) (*service, error) {
 	srv := &http.Server{Handler: api.Handler()}
 	go srv.Serve(listener)
 	go hub.Run(ctx)
+	type generation struct {
+		cancel context.CancelFunc
+		done   chan struct{}
+	}
 	var genMu sync.Mutex
-	var genCancel context.CancelFunc
+	var current *generation
 	startGen := func() error {
+		if ctx.Err() != nil {
+			return ctx.Err()
+		}
 		genMu.Lock()
 		defer genMu.Unlock()
-		if genCancel != nil {
+		if ctx.Err() != nil {
+			return ctx.Err()
+		}
+		if current != nil {
 			return nil
 		}
 		conn, err := pgx.Connect(ctx, cfg.DatabaseURL)
@@ -195,10 +210,16 @@ func runServe(ctx context.Context, cfg serveConfig) (*service, error) {
 			return err
 		}
 		gctx, cancel := context.WithCancel(ctx)
+		handle := &generation{cancel: cancel, done: make(chan struct{})}
 		runner := &store.Runner{
 			MarketID: cfg.MarketID, Interval: cfg.Interval, RetentionDays: cfg.Retention, Notify: hub.Notify,
-			Dial:   func(dialCtx context.Context) (*pgx.Conn, error) { return pgx.Connect(dialCtx, cfg.DatabaseURL) },
-			Open:   func(openCtx context.Context) (*pgx.Conn, error) { return pgx.Connect(openCtx, cfg.DatabaseURL) },
+			Log: slog.Default(),
+			Dial: func(dialCtx context.Context) (*pgx.Conn, error) {
+				return pgx.Connect(dialCtx, cfg.DatabaseURL)
+			},
+			Open: func(openCtx context.Context) (*pgx.Conn, error) {
+				return pgx.Connect(openCtx, cfg.DatabaseURL)
+			},
 			OnLock: func() { api.SetLocked(true) },
 			OnStop: func() { api.SetLocked(false) },
 			OnDBError: func(error) {
@@ -209,16 +230,21 @@ func runServe(ctx context.Context, cfg serveConfig) (*service, error) {
 				api.Observe(result.LastSeq, result.Tick, elapsed)
 			},
 		}
-		genCancel = cancel
+		current = handle
 		go func() {
 			runErr := runner.Run(gctx, conn)
+			// 初始抢锁失败时连接还没放进 held，这里关掉这次尝试。
+			// 重连失败时 Run 已关掉 next 和仍打开的旧连接，再关一次原连接没有效果。
 			conn.Close(context.Background())
 			genMu.Lock()
-			genCancel = nil
+			if current == handle {
+				current = nil
+			}
 			genMu.Unlock()
+			close(handle.done)
 			if runErr != nil && strings.Contains(runErr.Error(), "同市场已经启动") {
 				fmt.Fprintln(os.Stderr, runErr.Error())
-				cancelProcess()
+				os.Exit(1)
 			}
 		}()
 		return nil
@@ -229,14 +255,22 @@ func runServe(ctx context.Context, cfg serveConfig) (*service, error) {
 	done := make(chan struct{})
 	go func() {
 		<-ctx.Done()
+		api.SetShuttingDown(true)
 		genMu.Lock()
-		if genCancel != nil {
-			genCancel()
-		}
+		handle := current
 		genMu.Unlock()
-		shut, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-		defer cancel()
-		srv.Shutdown(shut)
+		if handle != nil {
+			handle.cancel()
+			timer := time.NewTimer(10 * time.Second)
+			select {
+			case <-handle.done:
+				timer.Stop()
+			case <-timer.C:
+			}
+		}
+		shut, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+		_ = srv.Shutdown(shut)
+		cancel()
 		pool.Close()
 		close(done)
 	}()
@@ -245,17 +279,17 @@ func runServe(ctx context.Context, cfg serveConfig) (*service, error) {
 		done: done,
 		pause: func() {
 			genMu.Lock()
-			cancel := genCancel
+			handle := current
 			genMu.Unlock()
-			if cancel != nil {
-				cancel()
+			if handle != nil {
+				handle.cancel()
 			}
 		},
 		resume: func() error {
 			deadline := time.Now().Add(5 * time.Second)
 			for time.Now().Before(deadline) {
 				genMu.Lock()
-				idle := genCancel == nil
+				idle := current == nil
 				genMu.Unlock()
 				if idle && !api.Locked() {
 					return startGen()
@@ -364,11 +398,4 @@ func temporary(err error) bool {
 		return false
 	}
 	return true
-}
-
-func cancelProcess() {
-	p, err := os.FindProcess(os.Getpid())
-	if err == nil {
-		_ = p.Signal(syscall.SIGTERM)
-	}
 }

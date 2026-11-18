@@ -150,3 +150,87 @@
 - 实施 · 未开始。北京时间 18:36 用户要求全部暂停并做好记录。恢复后实施顺序按共识：A（主路径 serve/runner/httpapi/compose×3）→ C 与 D 并行 → B（依赖 A）→ 全量验证（vet、race 单测、两步集成、桩负例）→ 四席复核。S4.1 的代码与文档修改仍在工作区未提交（用户此前要求暂存不提交，尚未执行 git add）。
 - 验证 · 本条无命令执行。无后台任务在跑：四席评审均已在 18:36 前返回结论；测试容器与镜像状态以 S4.1 收口记录为准（容器已删、镜像保留）。
 - 复核 · 不适用（未实施）。恢复实施完成后由四席按证据复核。
+
+## 2026-11-18 21:24 · S4.2 按已收敛共识恢复实施
+
+- 范围 · PLAN 的 S4.2。接手核对：PLAN 写明 S4.1 已完成、当前推进 S4.2；RECORD 最后一条（18:36）为四席两轮共识已收敛、实施暂停、未改代码。工作区代码仍是 S4.1 收口状态（PrepareSnapshot 仍有 nil 回退，serve 停机不等 runner，verify scale 仍按进程累计直方图）。代码与记录一致。本步不重开 18:36 的方案，按该条 v2 实施。不改 DESIGN。S4.3 及以后不在本步实跑。以数据库持久水位判定接续。
+- 第一轮与后续轮 · 见 18:36 条目。四席已确认同一项结论，本条不另开分歧。实施顺序：A 优雅停止 → C Smoke 与 D Scale → B 运行器与新进程接续 → 验证 → 四席按证据复核。
+- 实施 · 北京时间 21:56 前落盘。A：`serve.go` 停机改为先标记 shutting_down、取消当前一代并最多等 10 秒（`genDone` 在 `conn.Close` 之后关闭，空闲则跳过），再 `Shutdown` 2 秒并关池；`startGen` 入口检查 `ctx.Err()`；三份 compose 的 market 增加 `stop_grace_period: 15s`。`/v1/stream` 在 Prepare 之前对新建连返回 503 `shutting_down`，不绑 pause，不主动踢存量连接。`store.Runner` 删除 `maintainFailed`，Open 与 Maintain 失败都走 `noteMaintain`，日志带 `market_id` 与阶段，连接串用户口令改成 `redacted@`，退出期上下文取消不告警，`conn.Close` 使用 `context.Background`，`Run` 返回前等待在途清理。B：`compose.yaml` 增加 profile `test` 的 `test-db`（库 `voyage_test`、卷 `test-db-data`）和 `integration`（target `test`、`GOPROXY=off`、`restart: no`、store 先于其余包、`-count=1`、`ADMIN_DATABASE_URL` 指向 `/postgres`）。接续测试 `TestRestartNewProcess` 用 `TestServeHelper` 调 `serveCommand`，市场 `one-piece-restart`。Go 的 `os/exec` 在 Cancel 成功后即使退出码为 0，`Wait` 仍返回上下文错误，硬门改为 `ProcessState.Success()`。C/D：`verifySmokeWithin` 默认仍是 20 秒，水位改为同时上涨，快照后首条、五条连续、重连首条和读到 trade 才对照；`verifyScaleRun` 用窗口起止直方图差值，缺提交或计数回退分别报错，请求按 1 秒采样，订阅停止即刻输出水位差，`/metrics` 增加 `market_db_table_bytes`（10 秒缓存，失败省略行）。`generated_at` 只在 `read.go` 的 `formatGeneratedAt` 写成三位小数。`PrepareSnapshot` 为空时 `Validate` 拒绝启动，不再回退两次读取。
+- 验证 · `go vet ./...` 退出码 0。`go test -race -count=1` 无 integration 标签：store、stream、httpapi、dataset、engine、cmd 均 ok。一次性容器 `voyage-s42-test`（`--rm`，127.0.0.1:55432，库 `voyage_test`，口令为本地占位）上，`go test -race -count=1 -tags=integration ./store/` 退出码 0，4.969 秒；`./cmd/market-simulator/` 退出码 0，35.189 秒，含接续、正常停、早释放等提交、死等约 10 秒且窗口内 503 `shutting_down` 与 `/status` 200、原有查询与 bars。桩测试无 integration 标签，正常路径退出 0，水位只动一项、补发跳号、重连跳号、压测首条跳号均非零且 stderr 含对应句子。`docker compose config --services` 只有 db、market；`--profile test` 另有 test-db、integration。三份 compose 均有 `stop_grace_period: 15s`。默认栈容器没有启动。`docker compose --profile test run --rm --no-deps --entrypoint bash integration -lc 'exit 7'` 的 compose 退出码是 1，不是 7：构建要拉 `golang:1.25.14-bookworm`，Docker Hub `registry-1.docker.io:443` 两次超时（`dial tcp ... i/o timeout`）。本机没有这份基础镜像，已有的 `voyage-feed-market` 是旧运行镜像，不能代替 test 阶段。该次 run 新建了空卷 `voyage-feed_test-db-data` 和网络 `voyage-feed_default`，没有动 `voyage-feed_db-data`、`market-simulator-scale_db-data`、`market-simulator-full_db-data`。测试容器已于 21:56 前停止，`docker ps` 无容器。宿主侧（本次桩与集成都在 WSL 进程里，工具虽标注容器视角）：`nproc=16`，`MemTotal` 14151872 kB，内核 `Linux 6.6.87.2-microsoft-standard-WSL2`，cgroup memory 上限文件不存在，输出为 unknown。60 秒十路压测未跑，留给 S4.3。
+- 复核 · 21:56 尝试用四个只读席位复核，四个子代理均被中止，没有返回结论。按 AGENTS 记为部分复核、待补齐，不把 S4.2 写成通过。阻塞是 Docker Hub 超时，exit 7 未实测；四席结论待能使用该能力的会话补齐。下一步仍是 S4.2：镜像可拉取后补测 `exit 7`，并补四席复核。S4.3 不在本步开始。
+
+## 2026-11-18 22:03 · S4.2 第一轮四席只读评审，实施仍暂停
+
+- 范围 · PLAN 的 S4.2。本条只记第一轮四席只读评审，实施仍暂停。参与者：开发、产品、测试/验收、数据库/可靠性。测试/验收与数据库/可靠性本步常驻。评审只读，没有代写席位。不改 PLAN、DESIGN 与代码，没有 git 写操作。密钥、数据库口令和令牌不写入本记录。
+- 第一轮 · 各参席评审观察（按席位分句）：开发确认停机、接续、Smoke、Scale 工具与 18:36 一致，接受 ProcessState.Success() 作为退出码 0 判定，对照字段维持五个且不阻塞，没有看到必须先改代码才能重测的缺陷，关闭前只差 exit 7；stream_prepare 等水位超时从 10 秒改为 20 秒尚未单列进 RECORD，只影响慢机误失败。产品确认场景仍在首版，阻塞是 Smoke 未覆盖成交额与时间，以及 Scale 请求样本为 0 时仍可能退出码 0，无需用户裁定。测试/验收确认主体断言已覆盖停机、接续、Smoke、Scale，但维护失败后下一次触发没有断言，exit 7 与默认栈不受扰没有实测，成交对照少于完全一致。数据库/可靠性确认事务、清理水位、测试库隔离与已确认方案一致，阻塞是接续断言用了取消前水位，以及抢不到写锁时进程以 0 退出。共识：S4.2 不能关闭。停机口径维持 18:36：新建订阅 503 shutting_down，REST 仍 200，不主动对存量连接发 1013。exit 7 未实测：构建 golang:1.25.14-bookworm 时 Docker Hub 超时，compose 退出码 1，不能解释成运行器吞掉 7。空卷 voyage-feed_test-db-data 保留，不删除。重试 docker pull 仍超时。带 integration 的 cmd/market-simulator 整包后来跑过，约 35 秒，退出码 0；这不代表接续基线和抢锁退出码已经正确。60 秒压测、容器内 go test 留给 S4.3。本步不改 DESIGN。README 的 scale 退出码 2 归 S4.5。
+- 分歧 · 第二轮待确认，本条不实施。1. Smoke 对照字段：产品要求全字段；测试要求至少加 turnover_cents，其余等产品；开发主张维持五字段且不阻塞。2. Scale 零请求样本：产品要求非零退出；开发与测试未把它列为关闭阻塞。3. 维护再触发断言：测试要求补用例才算覆盖；开发认为行为已成立。4. 接续基线改用停稳后 seq1/tick1：数据库列为阻塞；开发未把它列为必须先改的缺陷。5. 抢锁失败非零退出并关闭 held：数据库列为阻塞；开发未把它列为必须先改的缺陷。
+- 后续轮 · 第二轮正在请原分歧各方确认同一项具体结论，确认前不实施。
+- 实施 · 未开始。没有改代码、配置、PLAN 或 DESIGN。
+- 验证 · 本条无新命令。exit 7 仍未实测，依据见上：构建超时使 compose 退出码为 1，不能解释成运行器吞掉 7。空卷 voyage-feed_test-db-data 保留。
+- 复核 · 第一轮已记录。S4.2 不能关闭，不标为完成。下一步仍是 S4.2：等原分歧各方确认同一项具体结论；确认前不实施。
+
+## 2026-11-18 22:12 · S4.2 短命令构建上下文
+
+- 范围 · 只让已有开发样本进入 test 阶段，使 `docker compose --profile test run --rm --no-deps --entrypoint bash integration -lc 'exit 7'` 能够执行。不改 PLAN 完成状态，不解决 22:03 的五项分歧，不删卷，不 pull，不启动 db、market 或 60 秒压测。
+- 原因 · `data/dev-src/characters.html` 等开发样本已在工作区。`git check-ignore` 没有忽略 `data/dev-src` 下的文件，`.dockerignore` 只排除 `/data/raw/`。Dockerfile 的 test 阶段继承 build，只复制了 `data/dev.json` 与 `data/scale.json`。`TestDevSample` 要读 `../data/dev-src/characters.html` 和 `../data/dev.report.json`，镜像里没有这两处，所以 `go vet ./... && go test -race ./...` 失败，compose 退出码 1。DESIGN 允许全量网页缺失，但这里缺的不是外部材料，不把测试改成跳过，也不编造网页。
+- 实施 · 只改 Dockerfile 的 test 阶段，补上已有的 `data/dev-src` 与 `data/dev.report.json`。运行时镜像仍只带走 `dev.json` 与 `scale.json`。
+- 验证 · 北京时间 22:15 前后，同一条 `docker compose --profile test run --rm --no-deps --entrypoint bash integration -lc 'exit 7'` 的 compose 退出码是 7。test 阶段 `go test -race ./...` 六个包均 ok，其中 dataset 1.125 秒。构建使用本地 `golang:1.25.14-bookworm`，没有 pull。命令前后 `docker ps -a` 都没有容器，db 与 market 没有拉起。`voyage-feed_db-data` 的 CreatedAt 仍是 2026-11-18T00:48:59+08:00，`market-simulator-scale_db-data` 仍是 2026-11-18T03:00:49+08:00，`market-simulator-full_db-data` 仍是 2026-11-18T08:21:22+08:00，`voyage-feed_test-db-data` 仍是 2026-11-18T21:51:19+08:00。没有删卷，没有 60 秒压测。这只说明短命令的退出码能传出，不表示开发样本或 S4.2 已验收。PLAN 完成状态未改。口令未写入本记录。
+
+## 2026-11-18 22:18 · S4.2 第二轮第 1–4 条开始实施
+
+- 范围 · PLAN 的 S4.2。第二轮第 1–4 条已由开发、产品、测试/验收、数据库/可靠性四席确认，本条开始实施这四条。第 5 条不实施。不改 DESIGN，不改 PLAN 完成状态，不把 S4.2 标成完成。不执行 git 写操作。口令与令牌不写入本记录。
+- 第一轮 · 见 2026-11-18 22:03 条目。
+- 后续轮 · 第二轮第 1–4 条四席确认同一结论并开始实施。1. Smoke 与 REST 同一条成交比较 market_id、event_seq、type、symbol、logical_tick、market_date、event_time、generated_at、price_cents、quantity、turnover_cents，任一不同则退出码非零；该笔 generated_at 至少三位小数；schema_version 不进入这组比较。2. Scale 在请求样本数为 0，或请求 p95 不是有限数时退出码非零；写入门槛仍是大于 250 毫秒失败，接收门槛仍是达到 1 秒失败；不为缺毫秒、p95 超门槛、缺表、追平失败新造桩负例。3. 只加测试：维护第一次失败并等该次结束后再次触发，第二次必须真正执行；maintaining 不复位时用例失败。不改「失败后清掉 maintaining」的现有行为，除非新断言证明没清掉。4. TestRestartNewProcess 以停稳后的 seq1/tick1 为唯一基线。新进程首条事件序号等于 seq1+1，这些新事件的最小 logical_tick 等于 tick1+1，条数等于序号跨度。seq<=seq1 的签名与停稳时一致。出现新事件的条件是 seq>seq1。不再用取消前的 h0/t0 断言新进程首条。三重停稳证据保留：退出码 0 用 ProcessState.Success()，同键锁可取得，水位连续两次不变。第 5 条测试席仍有异议：同端口监听失败会冒充抢锁失败。第三轮确认前不实施第 5 条，不改抢锁失败退出路径，不改 serve 的 SIGTERM 与退出码，不新增抢锁用例。
+- 实施 · 改了 `cmd/market-simulator/verify.go`、`cmd/market-simulator/verify_stub_test.go`、`store/runner_test.go`、`cmd/market-simulator/shutdown_integration_test.go`。Smoke 与 REST 同一条成交比较 market_id、event_seq、type、symbol、logical_tick、market_date、event_time、generated_at、price_cents、quantity、turnover_cents；schema_version 不在这组里。该笔 generated_at 不足三位小数则退出码非零。Scale 在请求样本数为 0 或请求 p95 不是有限数时退出码非零；写入仍是大于 250 毫秒失败，接收仍是达到 1 秒失败。没有为缺毫秒、p95 超门槛、缺表、追平失败新造桩负例。桩里同一序号的成交字段保持稳定，便于对照。`TestMaintainFailureRunsAgain` 在第一次失败结束后再次触发，第二次会执行。失败后 `maintaining` 已经清掉，用例通过，所以没有改 `store/runner.go` 里失败后清掉 maintaining 的行为。`TestRestartNewProcess` 只以停稳后的 seq1/tick1 为基线。没有改 `serve.go` 的 SIGTERM 与退出码，没有新增抢锁用例。没有改 PLAN、DESIGN。
+- 验证 · 北京时间 22:26。`gofmt -w` 上述四个 Go 文件后，`GOTOOLCHAIN=local go test -count=1 ./store/ ./cmd/market-simulator/` 退出码 0（store 0.006 秒，cmd 1.103 秒）。`GOTOOLCHAIN=local go test -race -count=1 ./store/ ./cmd/market-simulator/` 退出码 0（store 1.025 秒，cmd 2.133 秒）。`GOTOOLCHAIN=local go test -tags=integration -count=1 -run '^$' ./cmd/market-simulator/` 退出码 0，只编译，没有执行用例。`TestRestartNewProcess` 未执行：当时没有容器，`DATABASE_URL` 未设置，5432 与 55432 没有监听。没有 docker pull，没有删卷，没有启动 60 秒压测。口令未写入本记录。
+- 复核 · 四席尚未复核。S4.2 不标完成。PLAN 完成状态未改。第 5 条未实施。
+
+## 2026-11-18 22:32 · S4.2 补跑 TestRestartNewProcess
+
+- 范围 · 只补跑已改基线、当时未实跑的 `TestRestartNewProcess`。没有改业务代码、PLAN、DESIGN。没有 git 写操作，没有 docker pull，没有删卷，没有启动 market，没有 60 秒压测，没有跑抢锁用例。
+- 验证 · 北京时间 22:32。开跑前没有 `go test -tags=integration`。127.0.0.1 上测试库原先没在听。`compose.yaml` 的 profile `test` 服务 `test-db` 使用已有卷 `voyage-feed_test-db-data`，库名 `voyage_test`，容器端口 5432，文件里没有宿主机端口。本次只 `up` 该服务，用临时端口覆盖把 5432 绑到 127.0.0.1:5432，没有改仓库文件，镜像用本地 `postgres:17`，`--pull never`。连接串按该测试库的用户、库名和 `sslmode=disable`，主机为 127.0.0.1:5432。命令是 `GOTOOLCHAIN=local go test -race -count=1 -tags=integration -timeout 180s -run '^TestRestartNewProcess$' ./cmd/market-simulator/`，退出码 1。失败句：`shutdown_integration_test.go:140: ERROR: relation "bars_1m" does not exist (SQLSTATE 42P01)`。没有为了变绿改断言或代码。因此改了代码：否。S4.2 仍未完成。口令未写入本记录。
+
+## 2026-11-18 22:34 · S4.2 第 5 条抢锁失败非零退出
+
+- 范围 · 只实施 S4.2 第 5 条。不改 PLAN、DESIGN，不把 S4.2 标成完成。不改 `verify.go`、`verify_stub_test.go`、`shutdown_integration_test.go`、`runner_test.go`。不执行 git 写操作，不 docker pull，不删卷。口令与连接串不写入本记录。
+- 第一轮 · 见 2026-11-18 22:03 条目。第 5 条当时是：抢锁失败非零退出并关闭 held；数据库列为阻塞，开发未把它列为必须先改的缺陷。
+- 后续轮 · 开发、产品、测试/验收、数据库/可靠性四席确认第 5 条后开始实施。确认的行为：抢不到写锁时进程非零退出，不再 `cancelProcess` 发 SIGTERM 把自己收成退出码 0；正常 SIGTERM 停机仍返回 0。关闭发生在 stderr 和非零退出之前。初始抢锁失败时连接可能还没赋给 held，关闭这次尝试的连接。重连失败时关闭 next 以及仍打开的旧连接。`pg_advisory_unlock` 失败要记日志，不写连接串。监听在抢锁之前。地址已被占用时在 Listen 处退出，stderr 不会有「同市场已经启动」，这不是抢锁失败。22:18 条目里测试席对「同端口监听失败会冒充抢锁失败」的异议，由「先监听、占用地址不算抢锁失败」这一条收口。第 1–4 条不在本条实施。
+- 实施 · `cmd/market-simulator/serve.go` 去掉 `cancelProcess`。抢锁失败时先关掉这次尝试的连接，再把「同市场已经启动」写到 stderr，然后 `os.Exit(1)`。`store/runner.go` 重连抢锁失败时关闭 next；若上一次连接关闭没有成功、仍然开着，再关那条。`pg_advisory_unlock` 调用出错或返回未释放时记「释放写锁失败」，错误文本里的连接串不写入日志。初始失败不在 Runner 里关调用方的连接，避免 store 里既有用例在失败后还用同一条连接提交。监听顺序没有改，仍在抢锁之前。新增 `cmd/market-simulator/lock_integration_test.go`（integration 标签）：测试连接先持有该市场 `writer_lock_key`，被测进程使用另一个空闲 `HTTP_ADDR`；必须先对 `/healthz` 得到 200，再自行结束；判定用 `ProcessState.ExitCode()`，0 和信号死亡（负数）都失败，不用 Wait 的错误当结论；stderr 含「同市场已经启动」；退出后另一条连接拿不到锁，原持有者 `pg_advisory_unlock` 仍返回真。
+- 验证 · `gofmt -w` 上述三个 Go 文件。北京时间 22:26 本机没有测试库，`DATABASE_URL` 未设置，5432 与 55432 没有监听，同一条 go test 退出码 1，失败句是 `DATABASE_URL must target voyage_test`。随后 22:32 条目已把 profile test 的 test-db 绑到 127.0.0.1:5432 且为 healthy。本条没有再 up、pull 或删卷，只对着这个已有库跑：`GOTOOLCHAIN=local go test -race -count=1 -tags=integration -timeout 180s -run '^TestAdvisoryLockConflictExitsNonZero$' ./cmd/market-simulator/`，退出码 0，1.243 秒。没有重跑正常停机用例。正常 SIGTERM 仍由 `serveCommand` 在 `ctx.Done` 后返回 0，本条没有改那条路径。口令未写入本记录。
+- 复核 · 四席尚未按本条证据复核。S4.2 不标完成。PLAN 完成状态未改。
+
+## 2026-11-18 22:40 · S4.2 TestRestartNewProcess 空库先迁移
+
+- 范围 · 查清 `TestRestartNewProcess` 在未初始化测试库上失败的原因并做最小修正，然后只重跑这一例。不改断言，不改抢锁退出路径，不改 `lock_integration_test.go`、`serve.go`、`store/runner.go`。不改 PLAN、DESIGN 完成状态。不执行 git 写操作，不 docker pull，不删卷，不 up market，不跑 60 秒压测。口令与连接串不写入本记录。
+- 根因 · 第 140 行 `wipeMarket` 在 `startHelper` 之前就执行 `DELETE FROM bars_1m`。`serve` 的 `prepareOnce` 会先 `store.Migrate` 再查市场，但那发生在辅助进程启动之后。22:32 连上的 `voyage_test` 用的是更早构建失败时留下的卷 `voyage-feed_test-db-data`：库在，表不在，于是 `relation "bars_1m" does not exist (SQLSTATE 42P01)`。DESIGN 规定由 `serve` 在启动时迁移；这次是测试自己假定表已经存在。排查时该卷上已有 `001_init.sql`（写入时间约 22:33，另有市场 `one-piece-lock`），那是第 5 条用例事后迁上去的，不能解释 22:32 的失败。
+- 实施 · 改了 `cmd/market-simulator/shutdown_integration_test.go`。`TestRestartNewProcess` 在 `wipeMarket` 之前调用 `store.Migrate`。没有删 `bars_1m` 断言，没有手工建表。因此改了代码：是。
+- 验证 · 北京时间 22:40。开跑前没有另一条 `go test -tags=integration`。沿用已经在听的 test-db，没有重新 up。命令是 `GOTOOLCHAIN=local go test -race -count=1 -tags=integration -timeout 180s -run '^TestRestartNewProcess$' ./cmd/market-simulator/`，退出码 0，3.782 秒。S4.2 仍未完成。口令未写入本记录。
+
+## 2026-11-18 22:43 · S4.2 补跑正常停机集成测试
+
+- 范围 · 只记录正常停机集成测试的重跑。没有改代码、PLAN、DESIGN。没有 git 写操作。不把 S4.2 标成完成。口令未写入本记录。`TestAdvisoryLockConflictExitsNonZero` 这次没跑。接续用例不在本条重跑。
+- 验证 · 北京时间 22:43。补跑正常停机集成测试，总退出码 0。PASS：`TestShutdownStopsCleanly` 0.44s，`TestShutdownWaitsForCommit` 0.69s，`TestShutdownTransactionTimeout` 10.13s。超时用例日志有一行 ERROR「释放写锁失败」，含 conn closed，该用例仍 PASS。`TestAdvisoryLockConflictExitsNonZero` 这次没跑，它在 22:34 已通过。接续用例已在 22:40 记录为重跑退出码 0。
+- 复核 · 「释放写锁失败」这句交给开发、产品、测试/验收、数据库/可靠性四席复核，关闭结论未出。S4.2 不标完成。
+
+## 2026-11-18 22:49 · S4.2 四席复核收口
+
+- 范围 · 只收口 PLAN 的 S4.2。先对照完成标准与已落地证据，再标完成。不改业务代码，不启动 60 秒压测，不执行 git 写操作。口令未写入本记录。
+- 复核 · 开发、产品、测试/验收、数据库/可靠性四席同一结论：`TestShutdownTransactionTimeout` 日志里的「释放写锁失败 … conn closed」不阻塞关闭，不用改代码。会话级写锁随断开的连接释放。
+- 对照 · 四条完成标准都有已记录证据。停止新订阅与 10 秒上限：22:43 三个 `TestShutdown` 均 PASS，`TestShutdownTransactionTimeout` 为 10.13s 且仍 PASS。维护失败后下一次触发：`TestMaintainFailureRunsAgain` 于 22:18 通过，22:26 `go test ./store/` 退出码 0；同包脱敏用例把口令写成 `redacted@`。运行器与接续：22:15 的 compose `exit 7` 退出码是 7，db 与 market 未拉起；`voyage-feed_db-data`、`market-simulator-scale_db-data`、`market-simulator-full_db-data` 的 CreatedAt 未变。`TestRestartNewProcess` 空库先 `Migrate`，22:40 退出码 0：停稳水位为基线，首条序号为 seq1+1，新事件最小 tick 为 tick1+1，停稳前事件签名不变，逐笔回算的 K 线量额一致。抢锁失败：`TestAdvisoryLockConflictExitsNonZero` 于 22:34 退出码 0。Smoke：成交对照 11 个字段，`generated_at` 至少三位小数，22:26 `go test ./cmd/market-simulator/` 退出码 0。Scale 工具：请求样本数为 0 时退出码非零。60 秒十路压测归 S4.3，本步不跑。
+- 结论 · 不改代码。S4.2 关闭，PLAN 标为已完成。下一步是 S4.3。本条不开始实施 S4.3。
+
+## 2026-11-18 22:53 · S4.2 完成后暂停并本地提交
+
+- 范围 · 用户要求 S4.2 完成后暂停。S4.3 未实施，不标进行中或完成。不改业务代码，不启动压测。
+- 核对 · PLAN 总表与「从哪一步开始」仍写 S4.2 已完成，没有被改回未完成。S4.3 没有进行中或完成标记，保持未开始。
+- 实施 · 把当前工作区全部改动做一次本地提交。不 push。口令与令牌未写入本记录。
+
+## 2026-11-18 22:57 · 本地提交被拦住
+
+- 范围 · 接上一条。暂停说明已经写好。随后的 `git commit` 没有生成新提交：执行环境会自动附上 Co-authored-by 尾部，与本次明确要求冲突，提交被拦住。没有使用 `--no-verify`，没有 amend，没有 push，没有改 git config。
+- 实施 · 工作区改动已全部暂存，没有跳过密钥文件。HEAD 仍是 `a332c0b`。S4.3 仍未实施。
+
+## 2026-11-18 23:01 · 用户同意保留自动 Co-authored-by 并继续提交
+
+- 范围 · 用户同意保留自动 Co-authored-by 并继续提交。S4.2 保持已完成。S4.3 不标开始或完成。不 push，不改 git config，不用 --no-verify、amend、force，不重置暂存区。
+- 实施 · 本条与已暂存内容一并做本地提交。口令与令牌未写入本记录。
