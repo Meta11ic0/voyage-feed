@@ -1,0 +1,15 @@
+{
+  "entries": [
+    {"match": {"chr_id": "chr:1"}, "aliases": ["路飞"], "role": "leader", "source": "dev-fixture"},
+    {"match": {"chr_id": "chr:2"}, "role": "core", "source": "dev-fixture"},
+    {"match": {"chr_id": "chr:3"}, "role": "core", "source": "dev-fixture"},
+    {"match": {"chr_id": "chr:4"}, "role": "member", "source": "dev-fixture"},
+    {"match": {"chr_id": "chr:5"}, "role": "core", "source": "dev-fixture"},
+    {"match": {"chr_id": "chr:6"}, "role": "member", "source": "dev-fixture"},
+    {"match": {"chr_id": "chr:7"}, "role": "core", "source": "dev-fixture"},
+    {"match": {"chr_id": "chr:8"}, "role": "member", "source": "dev-fixture"},
+    {"match": {"chr_id": "chr:9"}, "role": "member", "source": "dev-fixture"},
+    {"match": {"chr_id": "chr:10"}, "role": "leader", "source": "dev-fixture"},
+    {"match": {"chr_id": "chr:11"}, "role": "core", "source": "dev-fixture"}
+  ]
+}

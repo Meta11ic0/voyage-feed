@@ -1,0 +1,17 @@
+.env
+.env.*
+!.env.example
+/bin/
+/market-simulator
+/cmd/market-simulator/market-simulator
+*.exe
+*.test
+*.out
+coverage.*
+*.prof
+/data/raw/
+.specstory/
+.cursorindexingignore
+.vscode/
+.claude/
+.cursor/

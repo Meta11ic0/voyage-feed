@@ -1,0 +1,47 @@
+name: market-simulator-scale
+
+services:
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: voyage
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-voyage-dev}
+      POSTGRES_DB: voyage
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U voyage -d voyage"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 20s
+
+  market:
+    build: .
+    command: ["serve"]
+    environment:
+      DATABASE_URL: postgres://voyage:${POSTGRES_PASSWORD:-voyage-dev}@db:5432/voyage?sslmode=disable
+      HTTP_ADDR: ":8787"
+      MARKET_ID: one-piece-scale
+      DATASET_PATH: /app/data/scale.json
+      MARKET_SEED: "7"
+      TICK_INTERVAL_MS: "1000"
+      TRADE_PROBABILITY_BPS: "200"
+      MAX_MOVE_BPS: "20"
+      INITIAL_CAP_BUDGET_CENTS: "100000000000"
+      EVENT_RETENTION_DAYS: "7"
+      MAX_STREAM_CLIENTS: "64"
+    ports:
+      - "127.0.0.1:8788:8787"
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "/app/market-simulator", "verify", "--base-url", "http://127.0.0.1:8787", "--market", "one-piece-scale", "--profile", "ready"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 20s
+
+volumes:
+  db-data:

@@ -1,0 +1,7 @@
+{
+  "items": [
+    {"name": "characters", "url": "https://shimotsukicodex.com/characters.html", "fetched_at": "2026-11-18T00:00:00Z"},
+    {"name": "appearances", "url": "https://shimotsukicodex.com/appearances.csv", "fetched_at": "2026-11-18T00:00:00Z"},
+    {"name": "rankings", "url": "https://onepiecewt100-2026.com/ja/final-rankings/", "fetched_at": "2026-11-18T00:00:00Z"}
+  ]
+}

@@ -1,0 +1,138 @@
+{
+  "schema_version": 1,
+  "dataset_id": "one-piece-c10-d624799bfd97",
+  "cutoff_chapter": 10,
+  "sources": [
+    {
+      "name": "characters",
+      "url": "https://shimotsukicodex.com/characters.html",
+      "fetched_at": "2026-11-18T00:00:00Z",
+      "sha256": "380a17c0df714b699c1aa045536a34d7ac2dcab421e59d03167c9cff0f9ef5f5",
+      "note": "candidates:12"
+    },
+    {
+      "name": "appearances",
+      "url": "https://shimotsukicodex.com/appearances.csv",
+      "fetched_at": "2026-11-18T00:00:00Z",
+      "sha256": "56b36c4966e996bfacf0f6f49b11dda154e2479fd29bd6815afed917d0378c1f",
+      "note": "appearance_covered:10"
+    },
+    {
+      "name": "rankings",
+      "url": "https://onepiecewt100-2026.com/ja/final-rankings/",
+      "fetched_at": "2026-11-18T00:00:00Z",
+      "sha256": "72e7949690a214303f723871a5beb072723374f90c377b8abc8a3140c51c694d",
+      "note": "rank_covered:11"
+    }
+  ],
+  "instruments": [
+    {
+      "instrument_id": "codex:chr:1",
+      "symbol": "D14001F4649BOP",
+      "name": "蒙其·D·路飞",
+      "sector": "草帽一伙",
+      "role": "leader",
+      "chapter_count": 6,
+      "popularity_rank": 1
+    },
+    {
+      "instrument_id": "codex:chr:10",
+      "symbol": "2A3AAB25E114OP",
+      "name": "战国",
+      "sector": "海军",
+      "role": "leader",
+      "chapter_count": 2,
+      "popularity_rank": 8
+    },
+    {
+      "instrument_id": "codex:chr:11",
+      "symbol": "BFCF80302D65OP",
+      "name": "青雉",
+      "sector": "海军",
+      "role": "core",
+      "chapter_count": null,
+      "popularity_rank": 25
+    },
+    {
+      "instrument_id": "codex:chr:2",
+      "symbol": "E9635D3EB1F7OP",
+      "name": "罗罗诺亚·索隆",
+      "sector": "草帽一伙",
+      "role": "core",
+      "chapter_count": 4,
+      "popularity_rank": 2
+    },
+    {
+      "instrument_id": "codex:chr:3",
+      "symbol": "306651A61CA3OP",
+      "name": "娜美",
+      "sector": "草帽一伙",
+      "role": "core",
+      "chapter_count": 3,
+      "popularity_rank": 3
+    },
+    {
+      "instrument_id": "codex:chr:4",
+      "symbol": "56FEB8913AAFOP",
+      "name": "乌索普",
+      "sector": "草帽一伙",
+      "role": "member",
+      "chapter_count": 2,
+      "popularity_rank": 11
+    },
+    {
+      "instrument_id": "codex:chr:5",
+      "symbol": "E38E2D74B57AOP",
+      "name": "山治",
+      "sector": "草帽一伙",
+      "role": "core",
+      "chapter_count": 3,
+      "popularity_rank": 11
+    },
+    {
+      "instrument_id": "codex:chr:6",
+      "symbol": "63BFCF895AD9OP",
+      "name": "托尼托尼·乔巴",
+      "sector": "草帽一伙",
+      "role": "member",
+      "chapter_count": 2,
+      "popularity_rank": 31
+    },
+    {
+      "instrument_id": "codex:chr:7",
+      "symbol": "70C967BA0397OP",
+      "name": "妮可·罗宾",
+      "sector": "草帽一伙",
+      "role": "core",
+      "chapter_count": 2,
+      "popularity_rank": 15
+    },
+    {
+      "instrument_id": "codex:chr:8",
+      "symbol": "25B2CCE27623OP",
+      "name": "弗兰奇",
+      "sector": "草帽一伙",
+      "role": "member",
+      "chapter_count": 2,
+      "popularity_rank": 16
+    },
+    {
+      "instrument_id": "codex:chr:9",
+      "symbol": "F82E9D68E681OP",
+      "name": "布鲁克",
+      "sector": "草帽一伙",
+      "role": "member",
+      "chapter_count": 3,
+      "popularity_rank": null
+    },
+    {
+      "instrument_id": "codex:chr:9001",
+      "symbol": "9D7164A1F0D9OP",
+      "name": "开发夹具路人",
+      "sector": "其他",
+      "role": "unknown",
+      "chapter_count": 0,
+      "popularity_rank": 50
+    }
+  ]
+}

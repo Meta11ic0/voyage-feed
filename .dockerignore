@@ -1,0 +1,10 @@
+.env
+.env.*
+.git
+/bin/
+/data/raw/
+.specstory/
+.cursor/
+.claude/
+.vscode/
+.cursorindexingignore

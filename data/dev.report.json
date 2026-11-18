@@ -1,0 +1,32 @@
+{
+  "instrument_count": 12,
+  "sectors": [
+    "其他",
+    "海军",
+    "草帽一伙"
+  ],
+  "appearance_covered": 10,
+  "rank_covered": 11,
+  "cutoff_chapter": 10,
+  "excluded": 0,
+  "conflicts": [],
+  "unmatched": [],
+  "missing_rank": [
+    "布鲁克"
+  ],
+  "missing_chapter_count": [
+    "青雉"
+  ],
+  "zero_chapter_count": [
+    "开发夹具路人"
+  ],
+  "tied_ranks": [
+    {
+      "rank": 11,
+      "names": [
+        "乌索普",
+        "山治"
+      ]
+    }
+  ]
+}

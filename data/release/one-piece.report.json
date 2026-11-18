@@ -1,0 +1,2513 @@
+{
+  "instrument_count": 1528,
+  "sectors": [
+    "A O Pirates",
+    "Acumate Pirates",
+    "Agotogi Sand Merchants",
+    "Ally of the Whitebeard Pirates",
+    "Angel Island",
+    "Animals of the Island of Rare Animals",
+    "Antonio's Graman",
+    "Arabasta",
+    "Arabasta Kingdom",
+    "Arlong Pirates",
+    "Aunt",
+    "Automata",
+    "Baratie",
+    "Baroque Works",
+    "Barrels Pirates",
+    "Barto Club",
+    "Beasts Pirates",
+    "Beasts Pirates, Tama",
+    "Beautiful Pirates",
+    "Bell-mère's mikan",
+    "Bellamy Pirates",
+    "Big Helmet Pirates",
+    "Big Mom Pirates",
+    "Black Cat Pirates",
+    "Blackbeard Pirates",
+    "Bliking Pirates, Drum Kingdom",
+    "Bluejam Pirates",
+    "Bonney Pirates",
+    "Bourgeois Pirates",
+    "Buggy Pirates",
+    "CP0",
+    "CP6",
+    "CP7",
+    "CP8",
+    "Cacao Island",
+    "Caesar Clown",
+    "Candy Pirates",
+    "Caribou Pirates",
+    "Carmel",
+    "Charlotte Family",
+    "Chimney",
+    "Chinjao Family",
+    "Chouchou",
+    "Clan of D.",
+    "Cocoyasi Village",
+    "Corrida Colosseum",
+    "Criminal",
+    "Criminal brand",
+    "Crocus",
+    "Cross Guild",
+    "Dadan Family",
+    "Davy Family",
+    "Divine Squad",
+    "Doerena Kingdom",
+    "Donquixote Pirates",
+    "Drake Pirates",
+    "Dressrosa",
+    "Easter Egg",
+    "Edison",
+    "Egana",
+    "Elbaph",
+    "Elbaph Royal Family",
+    "Esperia Kingdom",
+    "Evil Black Drum Kingdom",
+    "Fake Straw Hat Crew",
+    "Fallen Monk Pirates",
+    "Fire Tank Pirates",
+    "First Twenty",
+    "Fish-Man Island",
+    "Five Elders",
+    "Flying Pirates",
+    "Foosha Village",
+    "Foxy Pirates",
+    "Franky Family",
+    "Fujin and Raijin",
+    "Gaimon",
+    "Galley-La Company",
+    "Gally Pirates",
+    "Gan Fall",
+    "Germ Pirates",
+    "Germa Kingdom",
+    "Giant Warrior Pirates",
+    "Goa Kingdom",
+    "God Guardians",
+    "God's Army",
+    "Gol D. Roger",
+    "Golden Lion Pirates",
+    "Goldfish Empire",
+    "Gran Tesoro",
+    "Groggy Monsters",
+    "Happo Navy",
+    "Harahettania",
+    "Hawkins Pirates",
+    "Heart Pirates",
+    "Helmeppo",
+    "Higuma Bandits",
+    "His own crew",
+    "Hocker",
+    "Hokahoka Pirates",
+    "Hound Pets",
+    "Hyougoro Family",
+    "Iceburg",
+    "Ideo Pirates",
+    "Ilisia Kingdom",
+    "Impel Down",
+    "Johnny",
+    "Kamabakka Kingdom",
+    "Kanjuro",
+    "Karakuri Island",
+    "Kaya",
+    "Kid Pirates",
+    "King Neptune",
+    "Knights of God",
+    "Kokoro",
+    "Komurasaki",
+    "Kouzuki Family",
+    "Kouzuki Hiyori, Shimotsuki Family",
+    "Koza",
+    "Krieg Pirates",
+    "Kuja",
+    "Kuja Pirates",
+    "Kurozumi Family",
+    "Kurozumi Tama",
+    "Kyoshiro Family",
+    "Levely",
+    "Little Pirates",
+    "Loguetown Arms Shop",
+    "Loki",
+    "Lu Feld Conglomerate",
+    "Lulusia Kingdom",
+    "Lvneel Kingdom",
+    "Macro Pirates",
+    "Maelstrom Spider Pirates",
+    "Majiatsuka Kingdom",
+    "Marines",
+    "Marines G-1 Branch",
+    "Marines, G-2",
+    "Marines, Giant Squad",
+    "Marines, Marine 77th Branch",
+    "Marumieta",
+    "Mermaid Cafe",
+    "Mermaid Café",
+    "Mimawarigumi",
+    "Mogaro Kingdom",
+    "Mokomo Dukedom",
+    "Mokomo Dukedom, Inuarashi Musketeer Squad",
+    "Mt. Atama Thieves",
+    "NEO MADS",
+    "Nefertari Family",
+    "Neo Marines",
+    "Neptune Family",
+    "Neutral civilian",
+    "New Fish-Man Pirates",
+    "New Giant Warrior Pirates",
+    "New Spiders Cafe",
+    "Newkama Land",
+    "Nico Robin",
+    "Night Butterfly Pirates",
+    "Niho Navy",
+    "Ninja-Pirate-Mink-Samurai Alliance",
+    "Nojiko's mikan farm",
+    "Nox Pirates",
+    "Ohara",
+    "Ohara Archaeologists",
+    "Oide",
+    "On Air Pirates",
+    "Orange Town",
+    "Owl Library",
+    "Pacifista",
+    "Partys Bar",
+    "Peachbeard Pirates",
+    "Perona",
+    "Pirate crew",
+    "Polo Pirates",
+    "Poseidon",
+    "Prodence Kingdom",
+    "Pucci",
+    "Puddle Pirates",
+    "Pumpkin Cafe",
+    "Raijin Island",
+    "Rain Dinners",
+    "Red Hair Pirates",
+    "Reformation Army",
+    "Revolutionary Army",
+    "Riku Family",
+    "Robecca Hanberg",
+    "Rocks Pirates",
+    "Roger Pirates",
+    "Rolling Pirates",
+    "Roshio Pirates",
+    "Rosward Family",
+    "Rosy Life Riders",
+    "Rumbar Pirates",
+    "Ryugu Kingdom",
+    "Sabaody Archipelago",
+    "Saint Charlos",
+    "Sakura Kingdom",
+    "Sankan Kingdom",
+    "Saruyama Alliance",
+    "Sea Floor",
+    "Shakky's Rip-off Bar",
+    "Shandia",
+    "Shimotsuki Family",
+    "Skypiea",
+    "Social Club",
+    "Sorbet Kingdom",
+    "Space Pirates",
+    "Spade Pirates",
+    "Spade Pirates, Whitebeard Pirates",
+    "Stool Restaurant",
+    "Straw Hat Pirates",
+    "Subordinate of the Whitebeard Pirates",
+    "Subordinates of the Whitebeard Pirates",
+    "Sun Pirates",
+    "Super Spot-Billed Duck Troops",
+    "Takotopus Pirates",
+    "Takoyaki 8",
+    "Takoyaki 8, Mermaid Cafe",
+    "Tenguyama Hitetsu",
+    "Thriller Bark",
+    "Thriller Bark Pirates",
+    "Thriller Bark Victim's Association",
+    "Tom's Workers",
+    "Tontatta Kingdom",
+    "Tontatta Kingdom Scouting Unit",
+    "Torino Kingdom",
+    "Tulip Pirates",
+    "Ukkari Hot-Spring Island",
+    "Underworld",
+    "Usopp Security Force",
+    "Uzuki Family",
+    "Vegapunk",
+    "Vinsmoke Family",
+    "WCI 31",
+    "Wagomuland",
+    "Walrus School",
+    "Wanda",
+    "Wandering Clan",
+    "Wano Country",
+    "Wapol",
+    "Water 7",
+    "Whitebeard Pirates",
+    "World Economy News Paper",
+    "World Government",
+    "World Government Orphanage",
+    "World Government, Impel Down",
+    "Yamato",
+    "Yes Pirates",
+    "Yonta Maria Grand Fleet",
+    "Yosaku",
+    "其他"
+  ],
+  "appearance_covered": 1470,
+  "rank_covered": 1214,
+  "cutoff_chapter": 1198,
+  "excluded": 4,
+  "conflicts": [
+    "人气对应多个角色：ウーシー",
+    "人气对应多个角色：カシ神",
+    "人气对应多个角色：カバ紳士",
+    "人气对应多个角色：シャーロット・ローラ",
+    "人气对应多个角色：シーガル・ガンズ・ノズドン",
+    "人气对应多个角色：スマイリー",
+    "人气对应多个角色：トリ",
+    "人气对应多个角色：ビョルン",
+    "人气对应多个角色：ブロギー",
+    "人气对应多个角色：ボンバ",
+    "人气对应多个角色：マッシュ",
+    "人气对应多个角色：リスキー兄弟",
+    "人气对应多个角色：ロズワード・シャルリア宮",
+    "人气对应多个角色：ロズワード・チャルロス聖",
+    "人气对应多个角色：ロズワード・ロズワード聖",
+    "身份无法区分：codex:name:b65c022fdd40bd54 Wolf Unit",
+    "身份无法区分：codex:name:b65c022fdd40bd54 Wolf unit"
+  ],
+  "unmatched": [
+    "人气未匹配：BB",
+    "人气未匹配：BLACK（巨大パチンコ黒カブト擬人化）",
+    "人气未匹配：Dr.インディゴ",
+    "人气未匹配：Dr.キューキュー",
+    "人气未匹配：Dr.クロツル",
+    "人气未匹配：Dr.ナコー",
+    "人气未匹配：Dr.フィッシュボーネン",
+    "人气未匹配：Dr.ホンナー",
+    "人气未匹配：Dr.ポツーン",
+    "人气未匹配：F-ワニ",
+    "人气未匹配：GUMMER（がま口カバン擬人化）",
+    "人气未匹配：MAXマークス",
+    "人气未匹配：Mr.11",
+    "人气未匹配：Mr.13",
+    "人气未匹配：Mr.7",
+    "人气未匹配：Mr.7（元）",
+    "人气未匹配：Mr.9",
+    "人气未匹配：Mr.シミズ",
+    "人气未匹配：Mr.ビーンズ",
+    "人气未匹配：Mr.メロウ",
+    "人气未匹配：Mr.モモラ",
+    "人气未匹配：WCI31",
+    "人气未匹配：〝ハウリング〟ガブ",
+    "人气未匹配：うっかりツル兵衛",
+    "人气未匹配：おばけ（MMA）",
+    "人气未匹配：おまけ子（刀擬人化）",
+    "人气未匹配：お玉（黒炭 玉）",
+    "人气未匹配：お高（高尾）",
+    "人气未匹配：お鶴",
+    "人气未匹配：かみなり（MMA）",
+    "人气未匹配：くいな",
+    "人气未匹配：さらへび先生",
+    "人气未匹配：どらうぐる（MMA）",
+    "人气未匹配：どーも君",
+    "人气未匹配：にーずほっぐ（MMA）",
+    "人气未匹配：ふぇんりる（MMA）",
+    "人气未匹配：へのへのうんち",
+    "人气未匹配：べコリ",
+    "人气未匹配：みなともさん",
+    "人气未匹配：アイアンボーイ・スコッチ",
+    "人气未匹配：アシュラ童子（酒天丸）",
+    "人气未匹配：アラマキ（緑牛）",
+    "人气未匹配：アルベル（キング）",
+    "人气未匹配：アロー",
+    "人气未匹配：アンモナイツ",
+    "人气未匹配：イエローカブ（山吹オオカブトムシ）",
+    "人气未匹配：イガラム（Mr.8/イガラッポイ）",
+    "人气未匹配：イチカ",
+    "人气未匹配：イッショウ（藤虎）",
+    "人气未匹配：イッシー100（イッシー20）",
+    "人气未匹配：イム",
+    "人气未匹配：イワンX",
+    "人气未匹配：イースタンバード",
+    "人气未匹配：ウエスタンバード",
+    "人气未匹配：ウッホーくん",
+    "人气未匹配：ウータンダイバーズ",
+    "人气未匹配：エドワード・ニューゲート（白ひげ）",
+    "人气未匹配：エリマキランナーズ",
+    "人气未匹配：エース（刀擬人化）",
+    "人气未匹配：オニ丸（牛鬼丸）",
+    "人气未匹配：カイロ・クレヨ",
+    "人气未匹配：カウボーイ",
+    "人气未匹配：カクカクさん",
+    "人气未匹配：カサ婆",
+    "人气未匹配：カシ神の子",
+    "人气未匹配：カ～～～～モノハシ",
+    "人气未匹配：キウイ",
+    "人气未匹配：キノコビト",
+    "人气未匹配：キャプテン・グー",
+    "人气未匹配：キャプテン・シーマーズ",
+    "人气未匹配：キャプテン・ジョン",
+    "人气未匹配：キャベンディッシュ（ハクバ）",
+    "人气未匹配：キュロス（片足の兵隊）",
+    "人气未匹配：キラー（鎌ぞう）",
+    "人气未匹配：ギオン（桃兎）",
+    "人气未匹配：ギャルディーノ（Mr.3）",
+    "人气未匹配：ギョルさん",
+    "人气未匹配：ギョロ",
+    "人气未匹配：クザン（青雉）",
+    "人气未匹配：クマドリヤマンバ子",
+    "人气未匹配：クラバウターマン",
+    "人气未匹配：クロ（クラハドール）",
+    "人气未匹配：クンフージュゴン",
+    "人气未匹配：グリフォン（刀擬人化）",
+    "人气未匹配：グルトバニー（耳神様）",
+    "人气未匹配：グロッキーザウルス",
+    "人气未匹配：グロリオーサ（ニョン婆）",
+    "人气未匹配：ケルベロス（ゾンビ）",
+    "人气未匹配：ケルベロス（剣）",
+    "人气未匹配：ケンタロウス",
+    "人气未匹配：コアラ組",
+    "人气未匹配：コウシロウ",
+    "人气未匹配：コゼ",
+    "人气未匹配：コトリ",
+    "人气未匹配：コマッコフ",
+    "人气未匹配：コーヒーモンキーズ",
+    "人气未匹配：ゴーイング・メリー号",
+    "人气未匹配：サイエン（クイーン）",
+    "人气未匹配：サウザンド・サニー号",
+    "人气未匹配：サウスバード",
+    "人气未匹配：サカズキ（赤犬）",
+    "人气未匹配：サム",
+    "人气未匹配：サンカ",
+    "人气未匹配：サンドラマレナマズ",
+    "人气未匹配：サンドラ大トカゲ",
+    "人气未匹配：ザラ（ミス・ダブルフィンガー）",
+    "人气未匹配：シキ（金獅子）",
+    "人气未匹配：シミター太",
+    "人气未匹配：シャクヤク（シャッキー）",
+    "人气未匹配：シャンディアの酋長",
+    "人气未匹配：シャーロット・アキメグ",
+    "人气未匹配：シャーロット・オールメグ",
+    "人气未匹配：シャーロット・ガラ",
+    "人气未匹配：シャーロット・ドラジェ",
+    "人气未匹配：シャーロット・ドルチェ",
+    "人气未匹配：シャーロット・ナツメグ",
+    "人气未匹配：シャーロット・ニューイチ",
+    "人气未匹配：シャーロット・ニューゴ",
+    "人气未匹配：シャーロット・ニューサン",
+    "人气未匹配：シャーロット・ニューシ",
+    "人气未匹配：シャーロット・ニュージ",
+    "人气未匹配：シャーロット・ハルメグ",
+    "人气未匹配：シャーロット・フユメグ",
+    "人气未匹配：シャーロット・モーツァルト",
+    "人气未匹配：シャーロット・リンリン（ビッグ・マム）",
+    "人气未匹配：シロラー",
+    "人气未匹配：シーモンキー",
+    "人气未匹配：ジェム（Mr.5）",
+    "人气未匹配：ジョルジ裁判長",
+    "人气未匹配：スぺーシー中尉",
+    "人气未匹配：スガミチ",
+    "人气未匹配：ストンプ",
+    "人气未匹配：スノウクイーン",
+    "人气未匹配：スノウバード（雪鳥）",
+    "人气未匹配：スパイダーマウス",
+    "人气未匹配：スプラッシュ",
+    "人气未匹配：スプラッタ",
+    "人气未匹配：スペクトルさん",
+    "人气未匹配：スポイルじいさん",
+    "人气未匹配：セラフィム（クロコダイル）",
+    "人气未匹配：セラフィム（ゲッコー・モリア）",
+    "人气未匹配：セラフィム（ドンキホーテ・ドフラミンゴ）",
+    "人气未匹配：タコバルーン",
+    "人气未匹配：タニシ",
+    "人气未匹配：タマゴ男爵",
+    "人气未匹配：タルトタンク",
+    "人气未匹配：ダズ・ボーネス（Mr.1）",
+    "人气未匹配：ダッ～～～～クスフント",
+    "人气未匹配：チェス戎兵",
+    "人气未匹配：チキンおばさん",
+    "人气未匹配：チャドロス・ヒゲリゲス（茶ひげ）",
+    "人气未匹配：テラ",
+    "人气未匹配：テンセイ（黒馬）",
+    "人气未匹配：トキカケ（茶豚）",
+    "人气未匹配：トマトギャング",
+    "人气未匹配：トラファルガー・ロー（トラファルガー・Ｄ・ワーテル・ロー）",
+    "人气未匹配：ドスコイパンダ",
+    "人气未匹配：ドロフィー（ミス・メリークリスマス）",
+    "人气未匹配：ドンキホーテ・ホーミング聖",
+    "人气未匹配：ドンキホーテ・ロシナンテ（コラソン）",
+    "人气未匹配：ドーハ・イッタンカⅡ世",
+    "人气未匹配：ナスの兵士",
+    "人气未匹配：ナヅ・ケタガーリ中将",
+    "人气未匹配：ナミ魚人",
+    "人气未匹配：ナワバリウミウシ",
+    "人气未匹配：ニュース・クー",
+    "人气未匹配：ニョルニョ・ニャルマーニ",
+    "人气未匹配：ニン",
+    "人气未匹配：ネフェルタリ・リリィ",
+    "人气未匹配：ノースバード",
+    "人气未匹配：ハイキングベア",
+    "人气未匹配：ハイパー雪だるさん",
+    "人气未匹配：ハチマキナマズ村の長老",
+    "人气未匹配：ハック（オハラの学者）",
+    "人气未匹配：ハック（魚人）",
+    "人气未匹配：ハナフダ",
+    "人气未匹配：ハラマキ子（ゾロの腹巻擬人化）",
+    "人气未匹配：ハンガーさん",
+    "人气未匹配：バオ",
+    "人气未匹配：バッキンガム・ステューシー",
+    "人气未匹配：バナナワニ",
+    "人气未匹配：バレル",
+    "人气未匹配：バーボンJr.",
+    "人气未匹配：パシフィスタ",
+    "人气未匹配：パシフィスタ POLICE",
+    "人气未匹配：パシフィスタ マークⅢ",
+    "人气未匹配：パズルサソリ",
+    "人气未匹配：パッキー",
+    "人气未匹配：パンサメ",
+    "人气未匹配：パンダウーマン美",
+    "人气未匹配：パンダマン",
+    "人气未匹配：ヒコイチ",
+    "人气未匹配：ヒッピー・ザ・ドクロカレー",
+    "人气未匹配：ヒューマンドリル",
+    "人气未匹配：ヒョウタ",
+    "人气未匹配：ヒルルク",
+    "人气未匹配：ヒロ★ゴーモン",
+    "人气未匹配：ピアス三姉妹（ゾロのピアス擬人化）",
+    "人气未匹配：ピンクビー（桃色スズメバチ）",
+    "人气未匹配：フランキー（カティ・フラム）",
+    "人气未匹配：ブラーム",
+    "人气未匹配：ブルブルのプルル",
+    "人气未匹配：ブルーギリー",
+    "人气未匹配：ブルーゴリラ（ブルゴリ）",
+    "人气未匹配：プリンス・ベレット",
+    "人气未匹配：ベガパンク",
+    "人气未匹配：ベガパンク PUNK01｢正｣",
+    "人气未匹配：ベガパンク PUNK02｢悪｣",
+    "人气未匹配：ベガパンク PUNK03｢想｣",
+    "人气未匹配：ベガパンク PUNK04｢知｣",
+    "人气未匹配：ベガパンク PUNK05｢暴｣",
+    "人气未匹配：ベガパンク PUNK06｢欲｣",
+    "人气未匹配：ベガパンツ",
+    "人气未匹配：ベガフォース01",
+    "人气未匹配：ベビー5",
+    "人气未匹配：ベンサム（Mr.2・ボン・クレー）",
+    "人气未匹配：ベーブ（Mr.4）",
+    "人气未匹配：ホイケル",
+    "人气未匹配：ホトリ",
+    "人气未匹配：ホメ",
+    "人气未匹配：ボルサリーノ（黄猿）",
+    "人气未匹配：マイケル",
+    "人气未匹配：マウンテンリッキー",
+    "人气未匹配：マキノの子供",
+    "人气未匹配：マスケレドモ・ゴアユー鳥",
+    "人气未匹配：マチェーテのルン",
+    "人气未匹配：マッドサウルス",
+    "人气未匹配：マツゲ",
+    "人气未匹配：マトリョーサカ",
+    "人气未匹配：マトリョースカ",
+    "人气未匹配：マトリョーセカ",
+    "人气未匹配：マトリョーソカ",
+    "人气未匹配：マリアンヌ（ミス・ゴールデンウィーク）",
+    "人气未匹配：マンティコラ",
+    "人气未匹配：マーシャル・D・ティーチ（黒ひげ）",
+    "人气未匹配：ミキータ（ミス・バレンタイン）",
+    "人气未匹配：ミロ（ワンポコ）",
+    "人气未匹配：メイナード（キャップマン）",
+    "人气未匹配：モズ",
+    "人气未匹配：ヤガラ",
+    "人气未匹配：ヤマトの横乳（擬人化）",
+    "人气未匹配：ユキヒョ～～～～ウ",
+    "人气未匹配：ユニコーン",
+    "人气未匹配：ユルスマジマスク",
+    "人气未匹配：ヨシモトさん",
+    "人气未匹配：ヨモ牧師",
+    "人气未匹配：ヨロイオコゼ",
+    "人气未匹配：ヨンカ",
+    "人气未匹配：ヨンカツー",
+    "人气未匹配：ラパーン",
+    "人气未匹配：リク・ドルド3世（リッキー）",
+    "人气未匹配：リサイクルワン",
+    "人气未匹配：リップ・〝サービス〟・ドウティ",
+    "人气未匹配：リニアフォックス",
+    "人气未匹配：ロック",
+    "人气未匹配：ロックス・D・ジーベック（デービー・D・ジーベック）",
+    "人气未匹配：ロロノア・アラシ",
+    "人气未匹配：ロロノア・ピンゾロ",
+    "人气未匹配：ワニザメ",
+    "人气未匹配：ワラザネ",
+    "人气未匹配：ワルサギ",
+    "人气未匹配：ヴィオラ（ヴァイオレット）",
+    "人气未匹配：ヴィクトリア・シルトン・ドルヤナイカ",
+    "人气未匹配：七色ウツボブラザーズ",
+    "人气未匹配：三下",
+    "人气未匹配：三代鬼徹（刀擬人化）",
+    "人气未匹配：三助",
+    "人气未匹配：三日月のギャリー",
+    "人气未匹配：伝書バット",
+    "人气未匹配：傳ジロー（狂死郎）",
+    "人气未匹配：光月スキヤキ（天狗山飛徹）",
+    "人气未匹配：光月トキ（天月トキ）",
+    "人气未匹配：光月日和（小紫）",
+    "人气未匹配：八斎戒（金棒擬人化）",
+    "人气未匹配：凶（銀斧）",
+    "人气未匹配：和道一文字（刀擬人化）",
+    "人气未匹配：四下",
+    "人气未匹配：土竜（槍擬人化）",
+    "人气未匹配：夢鯉",
+    "人气未匹配：子海ネコ",
+    "人气未匹配：小山",
+    "人气未匹配：山さん",
+    "人气未匹配：幸ベエ",
+    "人气未匹配：建（金棒擬人化）",
+    "人气未匹配：怪力ドミンゴス",
+    "人气未匹配：怪鳥ピンキー",
+    "人气未匹配：慰霊刃のフガー",
+    "人气未匹配：抜け雀",
+    "人气未匹配：敷きグマ",
+    "人气未匹配：昇り龍（りゅーのすけ）",
+    "人气未匹配：春ダコ",
+    "人气未匹配：有罪陪審員",
+    "人气未匹配：法の番犬部隊",
+    "人气未匹配：海アリ",
+    "人气未匹配：海イヌのおまわりさん/海獣保安官",
+    "人气未匹配：海カバ",
+    "人气未匹配：海ネコ",
+    "人气未匹配：海リス",
+    "人气未匹配：海兎",
+    "人气未匹配：海熊",
+    "人气未匹配：海獅子",
+    "人气未匹配：特急エビ",
+    "人气未匹配：狛デーン",
+    "人气未匹配：狛虎",
+    "人气未匹配：狛鶏",
+    "人气未匹配：狛鹿",
+    "人气未匹配：玉指ゲロティニー",
+    "人气未匹配：瓢箪 フェン・ボック",
+    "人气未匹配：着火のリナリア",
+    "人气未匹配：福み",
+    "人气未匹配：秋水（刀擬人化）",
+    "人气未匹配：空魚",
+    "人气未匹配：綱渡りフナンボローズ",
+    "人气未匹配：縄引きのチャッペ",
+    "人气未匹配：菊之丞（お菊）",
+    "人气未匹配：蜜蜂兵",
+    "人气未匹配：豚車",
+    "人气未匹配：賢者ゴーデ",
+    "人气未匹配：軍隊ウルフ",
+    "人气未匹配：軽業フワーズ",
+    "人气未匹配：近海の主（ゴア王国）",
+    "人气未匹配：近海の主（ロングリングロングランド）",
+    "人气未匹配：遊蛇",
+    "人气未匹配：針神様",
+    "人气未匹配：鉄筋のスムージ",
+    "人气未匹配：門番",
+    "人气未匹配：闘魚",
+    "人气未匹配：雪だるさん",
+    "人气未匹配：電伝虫",
+    "人气未匹配：電語虫",
+    "人气未匹配：霜月フリコ",
+    "人气未匹配：霜月康イエ（トの康）",
+    "人气未匹配：首領・マーロン",
+    "人气未匹配：鬼哭（刀擬人化）",
+    "人气未匹配：魂の喪剣（刀擬人化）",
+    "人气未匹配：魔法の天候棒（擬人化）",
+    "人气未匹配：麦わら帽子（帽子擬人化）",
+    "人气未匹配：黒刀よる子（刀擬人化）",
+    "出场未匹配：Gyoro, Nin, and Bao 第 449 章",
+    "出场未匹配：Gyoro, Nin, and Bao 第 455 章",
+    "出场未匹配：Gyoro, Nin, and Bao 第 456 章",
+    "出场未匹配：Gyoro, Nin, and Bao 第 457 章",
+    "出场未匹配：Gyoro, Nin, and Bao 第 474 章",
+    "出场未匹配：Gyoro, Nin, and Bao 第 481 章",
+    "出场未匹配：Gyoro, Nin, and Bao 第 486 章",
+    "出场未匹配：Hippie 第 1122 章",
+    "出场未匹配：Hiro Gomon 第 1122 章",
+    "出场未匹配：Mokuba 第 1122 章",
+    "出场未匹配：Pandasharks 第 1181 章",
+    "出场未匹配：Scimitarta 第 1122 章",
+    "出场未匹配：Wolf Unit 第 536 章",
+    "出场未匹配：Wolf Unit 第 539 章",
+    "出场未匹配：Wolf unit 第 541 章",
+    "无法解析首次登场章节：Douglas Bullet"
+  ],
+  "missing_rank": [
+    "Acrobatic Fuwas",
+    "Adio Suerte",
+    "Ain",
+    "Akainu",
+    "Ammo Knights",
+    "Animal Species",
+    "Animal Species/Arabasta Saga",
+    "Animal Species/East Blue Saga",
+    "Animal Species/Sky Island Saga",
+    "Animal Species/Strong World",
+    "Animal Species/Summit War Saga",
+    "Animal Species/Video Games",
+    "Aokiji",
+    "Aramaki",
+    "Ashura Doji",
+    "Automata",
+    "Babe",
+    "Baby 5",
+    "Baccarat",
+    "Banshee",
+    "Bekori",
+    "Bellett",
+    "Bentham",
+    "Binz",
+    "Birdy",
+    "Bjorn",
+    "Bjorn (Pirate)",
+    "Blackback",
+    "Blue Gilly",
+    "Blue Gorilla",
+    "Blue Gorillas",
+    "Bogard",
+    "Bomba",
+    "Bomba (Marine)",
+    "Borsalino",
+    "Broggy",
+    "Brogy",
+    "Brownbeard",
+    "Buckin",
+    "Buckingham Stussy",
+    "Buggy Pirates",
+    "Candelle",
+    "Carina",
+    "Cavendish",
+    "Cerberus",
+    "Cerberus (Sword)",
+    "Chadros Higelyges",
+    "Chappe",
+    "Charlos",
+    "Charlotte Decuplets",
+    "Charlotte Dolce and Dragée",
+    "Charlotte Linlin",
+    "Charlotte Lola",
+    "Charlotte Mozart",
+    "Chessmarimo",
+    "Chicken",
+    "Chicory",
+    "Child of Kashigami",
+    "Choco Police",
+    "Clara",
+    "Cloud Wolf",
+    "Coffee Monkeys",
+    "Dachoman",
+    "Daz Bonez",
+    "Denjiro",
+    "Dice",
+    "Domo-kun and Nnke-kun",
+    "Donquixote Homing",
+    "Donquixote Rosinante",
+    "Douglas Bullet",
+    "Draugr",
+    "Drophy",
+    "Edward Newgate",
+    "Eggplant Soldier",
+    "Eikon",
+    "Fen Bock",
+    "Fenrir",
+    "Fighting Bull",
+    "Fighting Lion",
+    "Fishbonen",
+    "Franky",
+    "Fugar",
+    "Gab",
+    "Galdino",
+    "Gallant Hippo",
+    "Gally",
+    "Gantonio",
+    "Gem",
+    "Gerotini",
+    "Giant Squad",
+    "Giant Warrior Pirates",
+    "Gild Tesoro",
+    "Ginko",
+    "Gion",
+    "Gloriosa",
+    "Glove",
+    "Glutbunny",
+    "Goa King",
+    "Gode",
+    "Going Merry",
+    "Goo",
+    "Googly-Eyed",
+    "Guilty Jury",
+    "Gyoro",
+    "Gyoru",
+    "Hack",
+    "Hack (Archaeologist)",
+    "Hack (Fish-Man)",
+    "Han",
+    "Hana",
+    "Hanger",
+    "Hanji (Prisoner)",
+    "Happygun",
+    "Headband Catfish Village",
+    "Hera (Gladiator)",
+    "Hippo Gentleman",
+    "Hiriluk",
+    "Honner",
+    "Hotori and Kotori",
+    "Howling Gab",
+    "Humandrill",
+    "Hyoutauros",
+    "Igaram",
+    "Imu",
+    "Isshi-100",
+    "Issho",
+    "John",
+    "Jorge",
+    "Jörmungandr",
+    "Kairo Kureyo",
+    "Kakukaku",
+    "Kasa",
+    "Kashigami",
+    "Keith",
+    "Kibin",
+    "Kikunojo",
+    "Killer",
+    "King",
+    "Kirinkodanuki",
+    "Kirintauros",
+    "Kitton",
+    "Koala Mercenaries",
+    "Kobe",
+    "Kouzuki Hiyori",
+    "Kouzuki Sukiyaki",
+    "Kouzuki Toki",
+    "Koze and Packy",
+    "Kumate Tribe",
+    "Kung-Fu Dugong",
+    "Kuro",
+    "Kurotsuru",
+    "Kurozumi Tama",
+    "Kyo",
+    "Kyros",
+    "Kyukyu",
+    "Lilith",
+    "Lim",
+    "Linaria",
+    "Lionbuta",
+    "Lip Doughty",
+    "Lola",
+    "Lola (Zombie)",
+    "Lord of the Coast",
+    "Love",
+    "MAX Marks",
+    "MMA",
+    "Makino's Child",
+    "Manmayer Gurou",
+    "Manticores",
+    "Marianne",
+    "Marine Headquarters Court",
+    "Marlon",
+    "Marshall D. Teach",
+    "Mash",
+    "Masked Deuce",
+    "Master of the Waters",
+    "Matryo Princesses",
+    "Matsuge",
+    "Maynard",
+    "Medaka Mermaid Quintuplets",
+    "Michael and Hoichael",
+    "Mikita",
+    "Milo",
+    "Misery",
+    "Miss Mother's Day",
+    "Miss Saturday",
+    "Miss Thursday",
+    "Miss Tuesday",
+    "Misty",
+    "Mori Dako",
+    "Mosa",
+    "Mottled",
+    "Mountain God",
+    "Mountain Ricky",
+    "Mozu and Kiwi",
+    "Mr. 10",
+    "Mr. 11",
+    "Mr. 12",
+    "Mr. 13",
+    "Mr. 6",
+    "Mr. 7",
+    "Mr. 9",
+    "Mr. Beans",
+    "Mr. Mellow",
+    "Mr. Momora",
+    "Mr. Shimizu",
+    "Nako",
+    "Needle God",
+    "Nefertari D. Lili",
+    "News Coo",
+    "Nozdon",
+    "Numbers",
+    "Nyon",
+    "Octopus Mash",
+    "Onimaru",
+    "Ossamondo",
+    "Pacifista",
+    "Pekkori",
+    "Pike",
+    "Pinky",
+    "Pirate Bear",
+    "Pirate Penguin",
+    "Potaufeu",
+    "Potsun",
+    "Pururu",
+    "Puzzle Scorpions",
+    "Queen",
+    "Queen Mama Chanter",
+    "Ragnir",
+    "Raise Max",
+    "Reuven",
+    "Riku Doldo III",
+    "Risky Brothers",
+    "Risky Brothers (Zombies)",
+    "Rocks D. Xebec",
+    "Rosward",
+    "Rosward Charlos",
+    "Rosward Rosward",
+    "Rosward Shalria",
+    "Rosy Life Riders",
+    "Run",
+    "Ryuma (Zombie)",
+    "Ryunosuke",
+    "Sam",
+    "Samosa",
+    "Sarahebi",
+    "Scales",
+    "Sea Beast",
+    "Sea Beast Weapons",
+    "Sea King",
+    "Sea Lion",
+    "Sea Rabbit",
+    "Sea Raccoon",
+    "Seagull Guns Nozdon",
+    "Seamars",
+    "Shakuyaku",
+    "Shalria",
+    "Shandia Chief",
+    "Shiki",
+    "Shimotsuki Koushirou",
+    "Shimotsuki Kuina",
+    "Shimotsuki Yasuie",
+    "Sig",
+    "Slime",
+    "Smiley",
+    "Smooge",
+    "Snakeman (Gifter)",
+    "Soldier Zombie",
+    "South Bird",
+    "Space Pirates",
+    "Spacey",
+    "Spector",
+    "Splash and Splatter",
+    "Spoil",
+    "Sugamichi and Warazane",
+    "Super Spot-Billed Duck Troops",
+    "Surprise Zombies",
+    "Susu Susu no Mi",
+    "Takao",
+    "Tama",
+    "Tamago",
+    "Tanaka",
+    "Tarara",
+    "Tenguyama Hitetsu",
+    "Tensei",
+    "Tokikake",
+    "Topknot",
+    "Tori",
+    "Trafalgar D. Water Law",
+    "Tsumegeri Guards",
+    "Tsuru (Wano)",
+    "Tsurube",
+    "Tsurujo",
+    "Ucy",
+    "Underbite",
+    "Usagihebi",
+    "Utan Divers",
+    "Vegapunk",
+    "Vegapunk/Atlas",
+    "Vegapunk/Edison",
+    "Vegapunk/Lilith",
+    "Vegapunk/Pythagoras",
+    "Vegapunk/Shaka",
+    "Vegapunk/York",
+    "Viola",
+    "WCI 31",
+    "Wallace",
+    "Watchdog Unit of the Law",
+    "Yeti Cool Brothers",
+    "Yomo",
+    "Yoshimoto",
+    "Yuda",
+    "Zabo",
+    "Zala"
+  ],
+  "missing_chapter_count": [
+    "Gyoro"
+  ],
+  "zero_chapter_count": [
+    "Adio Suerte",
+    "Animal Species/East Blue Saga",
+    "Animal Species/Strong World",
+    "Animal Species/Summit War Saga",
+    "Animal Species/Video Games",
+    "Automata",
+    "Baburu",
+    "Baccarat",
+    "Bimine",
+    "Camel",
+    "Candy",
+    "Carina",
+    "Columbus",
+    "Demoni Aiyo",
+    "Dice",
+    "Dirt Boss",
+    "Douglas Bullet",
+    "Ettara Chaunkai",
+    "Forest Boss",
+    "Furika",
+    "Gaburu",
+    "Gild Tesoro",
+    "Goldfish Princess",
+    "Goro",
+    "Headband Catfish Village",
+    "Howling Gab",
+    "Koda",
+    "Kumate Tribe",
+    "Kung-Fu Dugong",
+    "Kurotsuru",
+    "Kyuji",
+    "Lim",
+    "Marine Headquarters Court",
+    "Mash",
+    "Mezasuzowan Pisuo",
+    "Minochihuahua",
+    "Mori Dako",
+    "Mouthto Mouthyan",
+    "News Coo",
+    "Nika",
+    "Octopus Mash",
+    "Pirate Bear",
+    "Pirate Penguin",
+    "Raise Max",
+    "Rakushitemo Terusubehainaika",
+    "Sea Boar",
+    "Sea King",
+    "Seamars",
+    "Serizawa",
+    "Shikon Kettai",
+    "Slime",
+    "Sukare Karehosui",
+    "Sukare Tainen",
+    "Sukune",
+    "Tanaka",
+    "Tomatito",
+    "Yurikah"
+  ],
+  "tied_ranks": [
+    {
+      "rank": 136,
+      "names": [
+        "Leo",
+        "Nekomamushi"
+      ]
+    },
+    {
+      "rank": 219,
+      "names": [
+        "Nico Olvia",
+        "Yasopp"
+      ]
+    },
+    {
+      "rank": 266,
+      "names": [
+        "Hatchan",
+        "Kokoro"
+      ]
+    },
+    {
+      "rank": 307,
+      "names": [
+        "Blueno",
+        "Spencer"
+      ]
+    },
+    {
+      "rank": 326,
+      "names": [
+        "Cosette",
+        "Vasco Shot"
+      ]
+    },
+    {
+      "rank": 343,
+      "names": [
+        "Jozu",
+        "Shura"
+      ]
+    },
+    {
+      "rank": 347,
+      "names": [
+        "Building Snake",
+        "Ikkaku"
+      ]
+    },
+    {
+      "rank": 352,
+      "names": [
+        "Ninjin",
+        "Tonjit"
+      ]
+    },
+    {
+      "rank": 361,
+      "names": [
+        "Charlotte Oven",
+        "Colon",
+        "Manboshi",
+        "Moon Isaac Jr."
+      ]
+    },
+    {
+      "rank": 366,
+      "names": [
+        "Manjaro",
+        "Wanze"
+      ]
+    },
+    {
+      "rank": 368,
+      "names": [
+        "Kumadori",
+        "Megalo",
+        "Rindo",
+        "Scarlett"
+      ]
+    },
+    {
+      "rank": 374,
+      "names": [
+        "Gama Pyonnosuke",
+        "Hakugan"
+      ]
+    },
+    {
+      "rank": 385,
+      "names": [
+        "Bonk Punch",
+        "Trebol"
+      ]
+    },
+    {
+      "rank": 400,
+      "names": [
+        "S-Bear",
+        "Salome"
+      ]
+    },
+    {
+      "rank": 402,
+      "names": [
+        "Catarina Devon",
+        "Fukurou"
+      ]
+    },
+    {
+      "rank": 419,
+      "names": [
+        "Road",
+        "Shu"
+      ]
+    },
+    {
+      "rank": 438,
+      "names": [
+        "Biblo",
+        "Doberman"
+      ]
+    },
+    {
+      "rank": 443,
+      "names": [
+        "Ganzui",
+        "Yosaku"
+      ]
+    },
+    {
+      "rank": 451,
+      "names": [
+        "Nero",
+        "Pica"
+      ]
+    },
+    {
+      "rank": 459,
+      "names": [
+        "Holy",
+        "Neptune"
+      ]
+    },
+    {
+      "rank": 462,
+      "names": [
+        "Charlotte Cornstarch",
+        "Polo Gram"
+      ]
+    },
+    {
+      "rank": 472,
+      "names": [
+        "Alice",
+        "Wadatsumi"
+      ]
+    },
+    {
+      "rank": 491,
+      "names": [
+        "Genbo",
+        "Sanjuan Wolf"
+      ]
+    },
+    {
+      "rank": 496,
+      "names": [
+        "Margarita",
+        "Nyasha"
+      ]
+    },
+    {
+      "rank": 503,
+      "names": [
+        "Ripper",
+        "Saru"
+      ]
+    },
+    {
+      "rank": 509,
+      "names": [
+        "Pound",
+        "Sarfunkel",
+        "Urashima"
+      ]
+    },
+    {
+      "rank": 517,
+      "names": [
+        "Iscat",
+        "Richie"
+      ]
+    },
+    {
+      "rank": 520,
+      "names": [
+        "Capone Pez",
+        "Zeo"
+      ]
+    },
+    {
+      "rank": 524,
+      "names": [
+        "Scotch",
+        "Solitaire",
+        "Suleiman"
+      ]
+    },
+    {
+      "rank": 530,
+      "names": [
+        "Jean Ango",
+        "Masira"
+      ]
+    },
+    {
+      "rank": 532,
+      "names": [
+        "Blue Fan",
+        "Jarul"
+      ]
+    },
+    {
+      "rank": 536,
+      "names": [
+        "Ran",
+        "Shoujou"
+      ]
+    },
+    {
+      "rank": 538,
+      "names": [
+        "Charlotte Poire",
+        "Morgan",
+        "Streusen"
+      ]
+    },
+    {
+      "rank": 542,
+      "names": [
+        "Bastille",
+        "Hasami",
+        "Kojuro"
+      ]
+    },
+    {
+      "rank": 550,
+      "names": [
+        "Hoe",
+        "Ukkari (Character)"
+      ]
+    },
+    {
+      "rank": 574,
+      "names": [
+        "Attach",
+        "Charlotte Anana",
+        "Gomorrah",
+        "Hogback",
+        "Itomimizu",
+        "Kong",
+        "Kuroobi"
+      ]
+    },
+    {
+      "rank": 581,
+      "names": [
+        "Mohji",
+        "Uni",
+        "Yarisugi"
+      ]
+    },
+    {
+      "rank": 584,
+      "names": [
+        "Clione",
+        "Some"
+      ]
+    },
+    {
+      "rank": 587,
+      "names": [
+        "Fourtricks",
+        "Miss Monday"
+      ]
+    },
+    {
+      "rank": 591,
+      "names": [
+        "Chocolat",
+        "Miss Friday",
+        "Satori"
+      ]
+    },
+    {
+      "rank": 594,
+      "names": [
+        "Boa Marigold",
+        "Conney"
+      ]
+    },
+    {
+      "rank": 599,
+      "names": [
+        "Charlotte Opera",
+        "Master",
+        "Nash"
+      ]
+    },
+    {
+      "rank": 603,
+      "names": [
+        "Aladine",
+        "Boodle"
+      ]
+    },
+    {
+      "rank": 611,
+      "names": [
+        "Happa Yamao",
+        "Red King"
+      ]
+    },
+    {
+      "rank": 617,
+      "names": [
+        "Charlotte Flampe",
+        "Nightcrab Girl",
+        "Rakuyo"
+      ]
+    },
+    {
+      "rank": 625,
+      "names": [
+        "Charlotte Daifuku",
+        "Mounblutain"
+      ]
+    },
+    {
+      "rank": 627,
+      "names": [
+        "Ban Dedessinée",
+        "Sukoshiba Kanishitoru"
+      ]
+    },
+    {
+      "rank": 629,
+      "names": [
+        "Banchi",
+        "Dobby Ibadonbo"
+      ]
+    },
+    {
+      "rank": 631,
+      "names": [
+        "Charlotte Mascarpone",
+        "Stansen",
+        "Terry Gilteo"
+      ]
+    },
+    {
+      "rank": 634,
+      "names": [
+        "Abdullah",
+        "Hamlet",
+        "Hiroshi"
+      ]
+    },
+    {
+      "rank": 638,
+      "names": [
+        "Baskerville",
+        "Saikoro"
+      ]
+    },
+    {
+      "rank": 643,
+      "names": [
+        "Banchina",
+        "Mizerka"
+      ]
+    },
+    {
+      "rank": 649,
+      "names": [
+        "Cocoa",
+        "Peepley Lulu",
+        "Tamagon"
+      ]
+    },
+    {
+      "rank": 652,
+      "names": [
+        "Charlotte Raisin",
+        "Jerry"
+      ]
+    },
+    {
+      "rank": 655,
+      "names": [
+        "Alpha",
+        "Minotaurus"
+      ]
+    },
+    {
+      "rank": 660,
+      "names": [
+        "Nanday",
+        "Prometheus"
+      ]
+    },
+    {
+      "rank": 662,
+      "names": [
+        "Doma",
+        "Zambai"
+      ]
+    },
+    {
+      "rank": 665,
+      "names": [
+        "Cocox",
+        "Donovan",
+        "Strawberry"
+      ]
+    },
+    {
+      "rank": 669,
+      "names": [
+        "Gatherine",
+        "Hakowan",
+        "Marumieta"
+      ]
+    },
+    {
+      "rank": 674,
+      "names": [
+        "Anjo",
+        "Blamenco",
+        "Disc J",
+        "Estrid",
+        "Russian"
+      ]
+    },
+    {
+      "rank": 680,
+      "names": [
+        "McGuy",
+        "Miss Catherina",
+        "Motzel"
+      ]
+    },
+    {
+      "rank": 683,
+      "names": [
+        "Bent",
+        "Dragon Number Thirteen",
+        "Kingdew",
+        "Napoleon"
+      ]
+    },
+    {
+      "rank": 692,
+      "names": [
+        "Gina",
+        "Jeet"
+      ]
+    },
+    {
+      "rank": 694,
+      "names": [
+        "Amazon",
+        "Charlotte Kato",
+        "Farul",
+        "Tibany"
+      ]
+    },
+    {
+      "rank": 699,
+      "names": [
+        "John Giant",
+        "Mornin",
+        "Ohm"
+      ]
+    },
+    {
+      "rank": 706,
+      "names": [
+        "Sora",
+        "Terracotta"
+      ]
+    },
+    {
+      "rank": 710,
+      "names": [
+        "Charlotte Nusstorte",
+        "Hammond",
+        "Ideaman"
+      ]
+    },
+    {
+      "rank": 714,
+      "names": [
+        "Brannew",
+        "Buffalo"
+      ]
+    },
+    {
+      "rank": 717,
+      "names": [
+        "Fossa",
+        "Soro"
+      ]
+    },
+    {
+      "rank": 720,
+      "names": [
+        "Charlotte Moscato",
+        "Motobaro",
+        "Ryuboshi"
+      ]
+    },
+    {
+      "rank": 723,
+      "names": [
+        "Charlotte Cadenza",
+        "Hip",
+        "Samurai Batts"
+      ]
+    },
+    {
+      "rank": 736,
+      "names": [
+        "Antonio",
+        "Kotatsu",
+        "Speed Jiru",
+        "Sweet Pea"
+      ]
+    },
+    {
+      "rank": 740,
+      "names": [
+        "Charlotte Joscarpone",
+        "Gimlet",
+        "Hop"
+      ]
+    },
+    {
+      "rank": 745,
+      "names": [
+        "Gig",
+        "Hildon",
+        "Noble Croc"
+      ]
+    },
+    {
+      "rank": 750,
+      "names": [
+        "Baburu",
+        "Muret",
+        "Shimotsuki Kouzaburou"
+      ]
+    },
+    {
+      "rank": 757,
+      "names": [
+        "Dogra",
+        "Minokoala",
+        "Pascia"
+      ]
+    },
+    {
+      "rank": 761,
+      "names": [
+        "Flapper",
+        "Pankuta Dakeyan",
+        "Yama"
+      ]
+    },
+    {
+      "rank": 765,
+      "names": [
+        "Chuchun",
+        "Curiel",
+        "Hamburg",
+        "Jigoro",
+        "Squard",
+        "Yuki"
+      ]
+    },
+    {
+      "rank": 773,
+      "names": [
+        "Cancer",
+        "Minatomo (Wano)",
+        "Oimo",
+        "Shin Detamaruka"
+      ]
+    },
+    {
+      "rank": 777,
+      "names": [
+        "Atmos",
+        "Blenheim",
+        "Concelot",
+        "Dosun",
+        "Kashii",
+        "Kelly Funk",
+        "Nefertari Titi",
+        "Okome"
+      ]
+    },
+    {
+      "rank": 786,
+      "names": [
+        "Capote",
+        "Wakasa"
+      ]
+    },
+    {
+      "rank": 789,
+      "names": [
+        "Dagama",
+        "Den",
+        "Goldfish Princess",
+        "Taroimo",
+        "Torasaburo"
+      ]
+    },
+    {
+      "rank": 796,
+      "names": [
+        "Buchi",
+        "Piper"
+      ]
+    },
+    {
+      "rank": 800,
+      "names": [
+        "Hocker",
+        "Hyouzou",
+        "Peachbeard",
+        "Sham"
+      ]
+    },
+    {
+      "rank": 806,
+      "names": [
+        "Ahho Zurako",
+        "Azuki",
+        "Blumarine",
+        "Charlotte Joconde",
+        "Lily",
+        "Quincy",
+        "Tilestone"
+      ]
+    },
+    {
+      "rank": 815,
+      "names": [
+        "Laskey",
+        "McKinley",
+        "Yamakaji"
+      ]
+    },
+    {
+      "rank": 821,
+      "names": [
+        "Daisy",
+        "Mario",
+        "Moodie",
+        "UK"
+      ]
+    },
+    {
+      "rank": 829,
+      "names": [
+        "Decalvan Brothers",
+        "Ipponume",
+        "Island Eater",
+        "Jigokukamabuta Megatenpanchiro",
+        "Marin",
+        "Mato",
+        "Very Good"
+      ]
+    },
+    {
+      "rank": 838,
+      "names": [
+        "Acilia",
+        "Ageha Woman",
+        "Giolla",
+        "Sapi"
+      ]
+    },
+    {
+      "rank": 843,
+      "names": [
+        "Charlotte Yuen",
+        "Pomp",
+        "Tsukimi"
+      ]
+    },
+    {
+      "rank": 848,
+      "names": [
+        "Carne",
+        "Compo",
+        "Inoichibannosuke",
+        "Potato",
+        "Unigaro"
+      ]
+    },
+    {
+      "rank": 854,
+      "names": [
+        "Diez Barrels",
+        "Emma",
+        "Sea Boar",
+        "Stalker"
+      ]
+    },
+    {
+      "rank": 860,
+      "names": [
+        "Akehende",
+        "Bian",
+        "Bobby Funk",
+        "Delacuaji",
+        "Karin",
+        "Nezumi",
+        "Ushiano"
+      ]
+    },
+    {
+      "rank": 870,
+      "names": [
+        "Charlotte Mobile",
+        "House",
+        "Kinderella"
+      ]
+    },
+    {
+      "rank": 875,
+      "names": [
+        "Chome",
+        "Mizuta Mawaritosuki",
+        "Poppy",
+        "Shin Jaiya"
+      ]
+    },
+    {
+      "rank": 880,
+      "names": [
+        "Big Pan",
+        "Charlotte Citron",
+        "Daigin",
+        "Diesel"
+      ]
+    },
+    {
+      "rank": 886,
+      "names": [
+        "Bingo",
+        "Cho",
+        "Coribou",
+        "Cosmo",
+        "Esta",
+        "Hustle"
+      ]
+    },
+    {
+      "rank": 894,
+      "names": [
+        "A O",
+        "Bubblegum",
+        "Carmel",
+        "Charlotte Effilée",
+        "Himuro",
+        "Maujii",
+        "Poker",
+        "Ririka"
+      ]
+    },
+    {
+      "rank": 907,
+      "names": [
+        "Charlotte Panna",
+        "Daruma",
+        "Hototogisu",
+        "Jacksonbanner",
+        "Minister of the Left"
+      ]
+    },
+    {
+      "rank": 914,
+      "names": [
+        "Alpacaman",
+        "Asahija",
+        "Babanuki",
+        "Chabo",
+        "Charlotte Marble",
+        "Columbus",
+        "Hatsume",
+        "Hihimaru",
+        "Ishigo Shitemanna",
+        "Maria Napole",
+        "Millet Pine",
+        "Minorhinoceros",
+        "Terry"
+      ]
+    },
+    {
+      "rank": 930,
+      "names": [
+        "Bluegrass",
+        "Dogya",
+        "Gaburu",
+        "Mororon",
+        "Mosh",
+        "Rabiyan",
+        "Tegata Ringana",
+        "Thalassa Lucas"
+      ]
+    },
+    {
+      "rank": 940,
+      "names": [
+        "Adele",
+        "Briscola",
+        "Charlotte Hachée",
+        "Clapp",
+        "Drug Peclo",
+        "Epoida",
+        "Fukurokuju",
+        "Gyogyo",
+        "Hera",
+        "Jiron",
+        "Mizuta Madaisuki",
+        "Nitro"
+      ]
+    },
+    {
+      "rank": 955,
+      "names": [
+        "Bushon",
+        "Damask",
+        "Gorilla",
+        "Kikyo",
+        "Kukai",
+        "Marie",
+        "Mishoin Cashible",
+        "Moqueca",
+        "Noriko",
+        "Yamenahare"
+      ]
+    },
+    {
+      "rank": 971,
+      "names": [
+        "Beegirl",
+        "Charlotte Normande",
+        "Donquixote Shivercalero",
+        "Jaguar",
+        "Miles",
+        "Pandora"
+      ]
+    },
+    {
+      "rank": 980,
+      "names": [
+        "Andre",
+        "Boogie",
+        "Buhichuck",
+        "Candre",
+        "Charlotte Basans",
+        "Giro Chintaro",
+        "Hitsugisukan",
+        "Kagikko",
+        "Lulis",
+        "Macro (Automaton)",
+        "Sphinx",
+        "Tsunagoro",
+        "Usakkov"
+      ]
+    },
+    {
+      "rank": 998,
+      "names": [
+        "Charlotte Montb",
+        "Charlotte Snack",
+        "Gambia",
+        "Hound",
+        "Ikaros Much",
+        "Jorul",
+        "Kisegawa",
+        "Kuromarimo",
+        "Minister of the Right",
+        "Minozebra",
+        "Peterman",
+        "Petermoo",
+        "Rabbitman",
+        "Sarie Nantokanette",
+        "Sunbell"
+      ]
+    },
+    {
+      "rank": 1014,
+      "names": [
+        "Albion",
+        "Basilisk",
+        "Chap",
+        "Charlotte Anglais",
+        "Galaxy",
+        "Giovanni",
+        "Karma",
+        "Magra",
+        "Poro",
+        "Ramen",
+        "Reck"
+      ]
+    },
+    {
+      "rank": 1032,
+      "names": [
+        "Bacura",
+        "Barry",
+        "Charlotte High-Fat",
+        "Charlotte Melise",
+        "Fuga",
+        "George Mach",
+        "Kikipatsu",
+        "Lady Tree",
+        "Maki",
+        "Moai",
+        "Neggy",
+        "Pisaro",
+        "Wany"
+      ]
+    },
+    {
+      "rank": 1050,
+      "names": [
+        "Aruyutayan V",
+        "Charlotte Maple",
+        "Comil",
+        "Gismonda",
+        "Grabar",
+        "Inbi",
+        "Papas",
+        "Skull",
+        "Thormann"
+      ]
+    },
+    {
+      "rank": 1065,
+      "names": [
+        "Ankoro",
+        "Biyo",
+        "Choi",
+        "Fugetsu Omusubi",
+        "Genrin",
+        "Goro",
+        "Kaneshiro",
+        "Kazenbo",
+        "Kechatch",
+        "Rokki",
+        "Tea IV",
+        "Yui",
+        "Yurikah"
+      ]
+    },
+    {
+      "rank": 1081,
+      "names": [
+        "Ahho Desunen IX",
+        "Akumai",
+        "Daddy Dee",
+        "Jalmack",
+        "Jigoku Benten",
+        "Konbu",
+        "Kunyun",
+        "Lonz",
+        "Muchana",
+        "Oide",
+        "Porchemy",
+        "Shanba",
+        "Tosa",
+        "Uholisia",
+        "Ultraking"
+      ]
+    },
+    {
+      "rank": 1101,
+      "names": [
+        "Belladonna",
+        "Caimanlady",
+        "Charlotte Counter",
+        "Eddy",
+        "Erik",
+        "Koito",
+        "Octopako",
+        "Seto",
+        "Stevie",
+        "Sukare Karehosui",
+        "Tamachibi",
+        "Uzuki Tempura"
+      ]
+    },
+    {
+      "rank": 1118,
+      "names": [
+        "Beak Remark",
+        "Charlotte Compo",
+        "Fuza",
+        "Gancho",
+        "Heppoko",
+        "Ho",
+        "Mr. Love",
+        "Scorpionlady",
+        "Tararan",
+        "Tsunokkov"
+      ]
+    },
+    {
+      "rank": 1131,
+      "names": [
+        "Corgi",
+        "Forest Boss",
+        "Gambo",
+        "Great Michael",
+        "Judy",
+        "Mukkashimi Tower",
+        "Pickles"
+      ]
+    },
+    {
+      "rank": 1143,
+      "names": [
+        "An Zengaiina",
+        "Boo",
+        "Enishida",
+        "Islewan",
+        "Kinoko",
+        "Lacuba",
+        "Oli",
+        "Palms",
+        "Pansy",
+        "Poppoko",
+        "Ramba",
+        "Rokkaku",
+        "Sheepshead",
+        "Tama (Sphinx)",
+        "Taro",
+        "Tokijiro",
+        "Wheel",
+        "Yamon"
+      ]
+    },
+    {
+      "rank": 1167,
+      "names": [
+        "Fillonce",
+        "Gotti",
+        "Kamijiro",
+        "Leonero",
+        "Lines",
+        "Monda",
+        "Mummy",
+        "Pellini",
+        "Shinosuke",
+        "Spandine",
+        "Zanki"
+      ]
+    },
+    {
+      "rank": 1178,
+      "names": [
+        "Charlotte Prim",
+        "Chokyumei-no Chosuke",
+        "Elmy",
+        "Kairen",
+        "Kebi",
+        "Mashikaku",
+        "Rowing",
+        "Sauce",
+        "Take",
+        "Zodia"
+      ]
+    },
+    {
+      "rank": 1194,
+      "names": [
+        "Beetleman",
+        "Footbianco",
+        "Hilmungardr",
+        "Holed'em",
+        "Inhel",
+        "Jean Goen",
+        "Jean Noueilles",
+        "Kappa",
+        "Maidy",
+        "Meadows",
+        "Mochi",
+        "Nugire Yainu",
+        "Peppoko",
+        "Pluming",
+        "Raijin",
+        "Rangram",
+        "Sharinguru"
+      ]
+    },
+    {
+      "rank": 1215,
+      "names": [
+        "Bishonure-Onna",
+        "Bluejam",
+        "Bobomba",
+        "Charlotte Basskarte",
+        "Charlotte Broyé",
+        "Charlotte Dacquoise",
+        "Charlotte Tablet",
+        "Dobon",
+        "Doubt Brothers",
+        "Gorishiro",
+        "Gram",
+        "Humphrey",
+        "Kamakirigirl",
+        "Macro",
+        "Mani",
+        "Nerine",
+        "Rakushitemo Terusubehainaika",
+        "Ross",
+        "Tsugaru Umi",
+        "Tsumonsieur Kamaya",
+        "Wanyudo"
+      ]
+    },
+    {
+      "rank": 1240,
+      "names": [
+        "Agyo",
+        "Aswa",
+        "Charlotte Cabaletta",
+        "Charlotte Chiboust",
+        "Charlotte De-Chat",
+        "Charlotte Marnier",
+        "Charlotte Mondée",
+        "Charlotte Noisette",
+        "Ducky Bree",
+        "Gangaru",
+        "Jumper",
+        "Kiba",
+        "Kimel",
+        "Lacroix",
+        "Mag",
+        "Monjii",
+        "Mummy Mee",
+        "Puppu",
+        "Sancrin",
+        "Tabuhachiro",
+        "Tank Lepanto"
+      ]
+    },
+    {
+      "rank": 1270,
+      "names": [
+        "Arthur",
+        "Bankuro",
+        "Beer VI",
+        "Bizarre",
+        "Blakey",
+        "Busshiri",
+        "Chao",
+        "Charlotte Brownie",
+        "Charlotte Dosmarche",
+        "Charlotte Nougat",
+        "Chihaya",
+        "Devil Dias",
+        "Egana",
+        "Garudan",
+        "Gazelleman",
+        "Giberson",
+        "Marilyn",
+        "Okame",
+        "Sind",
+        "Sukare Tainen",
+        "Uzuki Namida",
+        "Yotsubane"
+      ]
+    },
+    {
+      "rank": 1293,
+      "names": [
+        "Aegir",
+        "Aggie 68",
+        "Charlotte Wafers",
+        "Hippan Natte",
+        "Hoisassa",
+        "Julius",
+        "Kasagoba",
+        "Lu Feld",
+        "Mihar",
+        "Mikazuki",
+        "Mouseman",
+        "Muginn",
+        "Outlook III",
+        "Part",
+        "Pomsky",
+        "Serizawa",
+        "Zotto",
+        "Époni"
+      ]
+    },
+    {
+      "rank": 1317,
+      "names": [
+        "Baxcon",
+        "Catacombo",
+        "Charlotte Laurin",
+        "Charlotte Saint-Marc",
+        "Chesskippa",
+        "Chochinman",
+        "Donquino",
+        "Doran",
+        "Francois",
+        "Ganryu",
+        "Gattenshochinosukeo",
+        "Guillotine",
+        "Hangan",
+        "Horseman",
+        "Junan",
+        "Kibagaeru",
+        "Lemoncheese",
+        "Madilloman",
+        "Nubon",
+        "Renona Topakka",
+        "Roddy",
+        "Saitank",
+        "Sennorikyuru",
+        "Tonsfer",
+        "Umit",
+        "Urban",
+        "Uzu",
+        "Vincent",
+        "Zadie"
+      ]
+    },
+    {
+      "rank": 1353,
+      "names": [
+        "Agsilly",
+        "Anba",
+        "Candy",
+        "Charlotte Mash",
+        "Charlotte Wiro",
+        "Chocho",
+        "Deigoro",
+        "Demoni Aiyo",
+        "Donannoyo",
+        "Doringo",
+        "Ettara Chaunkai",
+        "Goki",
+        "Hawkman",
+        "Herb",
+        "Koda",
+        "Komane",
+        "Kurozumi Higurashi",
+        "Kurozumi Semimaru",
+        "Mayushika",
+        "Nangi",
+        "Nigeratta",
+        "Nokotti",
+        "Pavlik",
+        "Shioyaki",
+        "Stroganoff",
+        "Suke",
+        "Tenjo-Sagari",
+        "Tsurue Monnosuke",
+        "Wallem",
+        "Wolf (Elbaph)"
+      ]
+    },
+    {
+      "rank": 1389,
+      "names": [
+        "Amadob",
+        "Asla",
+        "Atagoyama",
+        "Battaman",
+        "Brew",
+        "Cezar",
+        "Charlotte Kanten",
+        "Charlotte Zuccotto",
+        "Erio",
+        "Hanzo",
+        "Hareji",
+        "Hidayu",
+        "Hocha",
+        "Ibusu",
+        "Jujiro",
+        "Kiev",
+        "Massui",
+        "Natto",
+        "Nure-Onna",
+        "Rivers",
+        "Schollzo",
+        "Tonjil",
+        "Toyama Tsujigiro",
+        "Vitan",
+        "Yatappe"
+      ]
+    },
+    {
+      "rank": 1415,
+      "names": [
+        "Ally",
+        "Brocca",
+        "Cands",
+        "Charlotte Angel",
+        "Charlotte Bavarois",
+        "Cornelia",
+        "Daikon",
+        "Ginnosuke",
+        "Jaki",
+        "Jugemu Jugemuko",
+        "Kakunoshin",
+        "Kinbo",
+        "Mouthto Mouthyan",
+        "Nodoi Wakan",
+        "Olav",
+        "Oran",
+        "Ottoland",
+        "Raideen",
+        "Rakuda",
+        "Redwolf",
+        "Rolling Logan",
+        "Sarai",
+        "Shine",
+        "Sicily",
+        "Sukune",
+        "Taka",
+        "Tansui",
+        "Tomatito",
+        "Urbain",
+        "Warashi",
+        "Waruno Furishiro",
+        "Yokan",
+        "Zucca"
+      ]
+    },
+    {
+      "rank": 1450,
+      "names": [
+        "Agotogi",
+        "Bimine",
+        "Blondie",
+        "CB Gallant",
+        "Caucasusman",
+        "Chiya",
+        "Coburn",
+        "Cosmos",
+        "Dotaku",
+        "Finamore",
+        "Gurutaro",
+        "Hikkomitsukumai",
+        "Hotei",
+        "Iwatobi",
+        "Jeep",
+        "Jibuemon",
+        "Kadar",
+        "Kaku (Wano)",
+        "Kazekage",
+        "Makko",
+        "Mecha-Shark",
+        "Mozambia",
+        "Oiwa",
+        "Reforte",
+        "Rint",
+        "Royder",
+        "Rush",
+        "Seki",
+        "Tomozo",
+        "Totts",
+        "Ubau",
+        "Usunoro",
+        "Yazaemon",
+        "Zururin"
+      ]
+    },
+    {
+      "rank": 1484,
+      "names": [
+        "Bisley",
+        "Blade",
+        "Bulldog",
+        "Dago",
+        "Ganryu (Roger Pirates)",
+        "Hatcha",
+        "Hublot",
+        "Isa",
+        "Jabari",
+        "Jigra",
+        "Kinga",
+        "Kop",
+        "Kuni",
+        "Nokokuwa Police",
+        "Norinosuke",
+        "Omasa",
+        "Papaneel",
+        "Pudos",
+        "Skaldi",
+        "Uraya Mashikatta",
+        "Uwattsura",
+        "Wellington"
+      ]
+    },
+    {
+      "rank": 1506,
+      "names": [
+        "Asashichi",
+        "Baggaley",
+        "Bishamon",
+        "Byron",
+        "Colscon",
+        "Daikoku",
+        "Didit",
+        "Disco",
+        "Hanji",
+        "Hewitt",
+        "Ikkaku (Wano)",
+        "Koiwa",
+        "Koshi Falcon",
+        "Kumagoro",
+        "Mari",
+        "Moyle",
+        "Muti",
+        "Nakaiwa",
+        "Nashi",
+        "Ninth",
+        "Rampo",
+        "Ratel",
+        "Sandayu",
+        "Sarutobi",
+        "Tritobu",
+        "Yame",
+        "Zangirimaru"
+      ]
+    },
+    {
+      "rank": 1533,
+      "names": [
+        "Akudai Kanzaburo",
+        "Bungo",
+        "Couran",
+        "Fujin",
+        "Furika",
+        "Furrari",
+        "Gorobe",
+        "Hara",
+        "Ibiributsu",
+        "Inukai",
+        "Juki",
+        "Kagero",
+        "Kairiken",
+        "Mizuira",
+        "Monjiro",
+        "Mugren",
+        "Neoki",
+        "Roche",
+        "Shikon Kettai",
+        "Sonieh"
+      ]
+    },
+    {
+      "rank": 1553,
+      "names": [
+        "Bongo",
+        "Buche",
+        "Chichilisia",
+        "Dashiteyaro",
+        "Kyuji",
+        "Roji",
+        "Saber",
+        "Ukon",
+        "Yamanba"
+      ]
+    },
+    {
+      "rank": 1563,
+      "names": [
+        "Kamekichi",
+        "Kurosawa",
+        "Spartan",
+        "Tamikebao"
+      ]
+    }
+  ]
+}
