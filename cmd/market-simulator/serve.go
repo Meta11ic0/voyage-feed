@@ -167,6 +167,7 @@ func runServe(ctx context.Context, cfg serveConfig) (*service, error) {
 	}
 	hub.Fetch = api.Fetch
 	hub.Watermark = api.Watermark
+	hub.PrepareSnapshot = api.PrepareSnapshot
 	hub.OnDBError = api.NoteDBError
 	hub.OnSlow = api.NoteDisconnect
 	listener, err := net.Listen("tcp", cfg.HTTPAddr)

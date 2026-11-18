@@ -27,11 +27,12 @@ func (s *Server) stream(w http.ResponseWriter, r *http.Request) {
 		writeError(w, http.StatusServiceUnavailable, "over_capacity", "订阅已满", nil)
 		return
 	}
-	sub, high, replay, status, prepErr := s.Hub.Prepare(r.Context(), after)
-	if status != 0 {
-		s.writeStreamStatus(w, r, status, prepErr)
+	prep := s.Hub.Prepare(r.Context(), after)
+	if prep.Status != 0 {
+		s.writeStreamStatus(w, prep)
 		return
 	}
+	sub, high, replay := prep.Sub, prep.High, prep.Replay
 	conn, err := websocket.Accept(w, r, nil)
 	if err != nil {
 		s.Hub.Release(sub)
@@ -111,21 +112,16 @@ func (s *Server) writeFrame(write func([]byte) error, conn *websocket.Conn, sub 
 	return true
 }
 
-func (s *Server) writeStreamStatus(w http.ResponseWriter, r *http.Request, status int, err error) {
-	switch status {
+func (s *Server) writeStreamStatus(w http.ResponseWriter, prep stream.PrepareResult) {
+	switch prep.Status {
 	case http.StatusGone:
-		_, retained, werr := s.Watermark(r.Context())
-		if werr != nil {
-			s.failDB(w, werr)
-			return
-		}
-		writeError(w, http.StatusGone, "cursor_expired", "游标早于可查询范围", map[string]string{"first_retained_seq": num(retained)})
+		writeError(w, http.StatusGone, "cursor_expired", "游标早于可查询范围", map[string]string{"first_retained_seq": num(prep.Retained)})
 	case http.StatusConflict:
 		writeError(w, http.StatusConflict, "replay_too_large", "续订缺口超过 1024，请先查询历史", nil)
 	case http.StatusBadRequest:
 		writeError(w, http.StatusBadRequest, "bad_cursor", "after_seq 晚于已提交序号", nil)
 	default:
-		s.failDB(w, err)
+		s.failDB(w, prep.Err)
 	}
 }
 

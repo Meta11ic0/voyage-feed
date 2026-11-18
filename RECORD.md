@@ -7,11 +7,11 @@
 ~~~text
 ## YYYY-MM-DD HH:MM · 任务编号和动作
 - 范围和输入
-- 第一轮 · 开发观察、产品观察、分歧
+- 第一轮 · 各参席评审观察（按席位分句）、分歧
 - 后续轮 · 修订、其他视角（如有）、各方确认及通过条件
 - 实施 · 实际动作和涉及的文件
 - 验证 · 命令、结果、运行时观测和证据
-- 双方复核 · 通过、失败或阻塞，下一步
+- 复核 · 各参席评审结论、通过、失败或阻塞，下一步
 ~~~
 
 ## 2026-11-18 00:20 · H-00 初始化接手资料
@@ -107,3 +107,46 @@
 - 服务停止、卷保留、Git 无提交，分别以 08:30、08:31、08:32 的条目为准，本条不重写那些事实。
 - 未授权前不开始 S5。
 - 用户要求暂存，不提交不推送。
+
+## 2026-11-18 12:00 · 整理十轮评估意见
+
+- 范围是把 2026-11-18 五角色十轮只读评估的已收口结论写入根目录 `评估.md`。第十轮五人已同意收口：普通开发、投资者、策略研究专家、量化交易开发、产品经理。收口原句在 `评估.md` 末节。
+- 实施 · 新建 `评估.md`。本次只整理评估意见，未改设计、未改代码、未跑测试、未改 PLAN 状态。没有执行 git 写操作，没有启动容器。
+- 验证 · 本条不附命令输出。S4 仍是已停止，S5 仍待授权。密钥未写入。
+- 双方复核 · 本步只落文档。不把 S4 写成通过，不开始 S5。
+
+## 2026-11-18 14:18 · S4/S5 调整实施及验收计划
+
+- 范围 · 按用户要求结合评估与当前工作区优化 `PLAN.md`，在本条记录评审和验证。S4 已停止，S5 待授权。本步仅调整计划。
+- 第一轮 · 开发 Agent 要求先处理行情正确性，随后补停止、独立集成环境、Smoke 断言、同库新进程重启及同次压测证据。产品 Agent 要求人工验收聚焦用户实际操作，正式资料缺口独立记录，README 补中文目录和使用口径，`/status` 新字段待确认。双方都指出旧卷现状未核实。需要统一的是 S5 的重启证据如何与自动验收复用，以及何时允许开始手动检查。
+- 第二轮 · 双方确认 S4.1 行情正确性、S4.2 运行与工具、S4.3 开发和合成实跑、S4.4 正式发布、S4.5 README。S5 经单独授权且开发与合成前置通过后可开展。重启后 Smoke 可与 S5 共享一次真实重启并回填 S4.3，其余前置须先通过。自动重启以旧进程停稳后的最终数据库水位为准，人工重启以已消费游标验证续读。正式数据缺口独立阻塞，整体通过仍须全部必验项有证据。旧卷仅在核实缺失时才记新基线。开发与产品同意核对链接、依赖、状态、历史记录及差异。
+- 实施 · 更新 `PLAN.md`，保留 H-00 和 S0–S3 的历史任务行。补充各子项的完成标准、S5 前置、人工验收步骤、证据和交付范围。`/status` 扩展列待产品确认。
+- 验证 · `git --no-optional-locks diff --check` 退出码 0。本地脚本逐项校验 PLAN 的文件链接、章节锚点、历史任务行、S4/S5 状态、五个子项、五项人工操作及本记录的追加方式，退出码 0。现有差异为 `PLAN.md` 和 `RECORD.md`，另有原已存在的未跟踪 `评估.md`。本步未启动容器、未跑应用测试、未写 Git。旧卷与 S4/S5 实测待授权后核验。
+- 双方复核 · 开发确认依赖无循环、压力门槛及重启证据可执行。产品确认正式资料和开发手动验收可独立记状态，使用指引和范围符合共识。计划调整通过，S4 仍为已停止，S5 仍待授权。
+
+## 2026-11-18 16:10 · 评审席位配置升级
+
+- 范围 · 按用户要求把评审配置由开发与产品两席升级为分档常驻，涉及 AGENTS.md「多轮评审」、PLAN.md 开头段与 S4.4、S5 表述、RECORD.md 头部模板四处。本步本身仍按原两席规则评审，新配置自下一条实施步骤起生效。不改 DESIGN、不改代码、不启动容器。
+- 第一轮 · 各参席评审观察（按席位分句）：开发认为四席方向成立但草案有五处必改（共识规则在无分歧时退化为零确认、缺僵局出口、RECORD 模板漏同步、缺裁剪规则、仲裁绑定步骤编号而非分歧主题），另指出能力不可用兜底适用范围收窄、评估收口结论可被重开、PLAN S5 现文与草案矛盾；产品认为四席全步骤一刀切过度配置应按步骤分档、记录篇幅会膨胀两三倍需分句合并约束、量化视角应为提供复核意见而非仲裁、S5 应保持两席。分歧两处：分档默认值（至少三席下限 vs 按步骤写死）、S5 复核组成（含数据库/可靠性席 vs 两席加按触发）。
+- 后续轮 · 修订版：按步骤写死席位（S4.1–S4.3 四席；S4.4 开发、产品加数据审核；S4.5 开发与产品），另加召集条款（任一常驻席位可召集有实质输入的缺席席位，仅被召集后仍未参加才记缺席理由）；修订版交回全体参席并留出回应，未分歧席位无异议视为同意、提出异议即列为分歧方，原分歧各方分别确认同一项具体结论；两轮不收敛时记各方立场、按主题追加或提请用户裁定；量化交易开发视角提供复核意见；评估.md 收口结论视为既有共识不重开；能力兜底对常驻与追加席位一体适用，缺席席复核未补齐前该步记部分复核待补齐。开发确认共识 1–8 并附两条执行口径（无异议以修订版送达并留出回应为前提；部分复核不写成全部通过），接受分档，S5 选方案 B；产品确认共识 1–8 并澄清缺席记录仅限被召集后缺席，接受分档，由方案 A 改为接受方案 B（条件为 S5 条目仍按席位分句合并）。通过条件：四处修改按修订版落地，模板改动不动历史条目，git diff --check 干净。
+- 实施 · AGENTS.md「多轮评审」四条 bullet 按修订版替换（吸收双方执行口径：召集后缺席才记理由、无异议以送达并留回应为前提、部分复核待补齐）。PLAN.md 开头段改引用式（行 5），S4.4 第一条加「本步评审另加数据审核 Agent」（行 44），S5 表格行与第 5 步改为「开发、产品与数据库/可靠性复核」（行 15、60）。RECORD.md 头部模板两行改多席位口径（「第一轮 · 各参席评审观察（按席位分句）」「复核 · 各参席评审结论」），历史条目未动。本条先写共识后落盘。
+- 验证 · `git --no-optional-locks diff --check` 退出码 0。grep 确认 PLAN 行 5、44、15、60 与 AGENTS 行 11 的新表述落位，「每步动手改动前启动或复用两个真实 Agent」「开发与产品 Agent 至少」等旧表述无残留，「各参席评审观察」出现 2 次（模板加本条）。差异统计：AGENTS.md 8 行、PLAN.md 61 行、RECORD.md 29 行变更。未启动容器、未跑应用测试、未写 Git 暂存或提交。
+- 复核 · 开发与产品均按落盘文件复跑验证后通过。开发确认四条 bullet、PLAN 四处与模板两行落位，两条执行口径如实体现，旧表述无残留；对 bullet 1 召集记录口径的产品侧收窄（仅被召集后缺席才记理由）在复核中追认，理由为收窄版保留「任一常驻席位可召集」「被召集后缺席须记理由」两个封堵机制且与记录膨胀控制同向，构成有记录的两席一致。产品确认澄清如实体现、方案 B 两处同步、冲突消解、16:10 条目按新格式生效且意见转述无杜撰。双方共同说明：验证段差异统计为工作区累计未提交差异，PLAN 的 61 行大部分来自 14:18 的计划重写，本步实际仅改 PLAN 行 5、15、44、60 四处；今后验证行区分工作区累计差异与本步涉及行。本步关闭，S4 仍为已停止，S5 仍待授权，新评审配置自下一条实施步骤起生效。
+
+## 2026-11-18 16:34 · S4.1 行情正确性修复（进行中）
+
+- 范围 · PLAN 的 S4.1：Hub prime 失败后补发连续性与 Prepare 同快照读取、/bars 周期截断修复与 as_of_seq。按新席位配置由开发、产品、测试/验收、数据库/可靠性四席常驻评审。改动目标文件 stream/hub.go、httpapi/read.go、httpapi/bars.go、httpapi/ws.go、cmd/market-simulator/serve.go 及对应测试；不改 DESIGN、无迁移、无配置变更、无新协议帧。
+- 第一轮 · 各参席评审观察（按席位分句）：开发确认两缺陷成立，支持 kickAll 复用 1013 协议路径与 PrepareSnapshot 注入，指出锁内单临界区顺序、nil 回退、日界单一事实来源，倾向 flush 竞态记限制不改；产品确认三点方向全部同意无阻塞，提出关闭文案区分记 S4.5、判定/踢/置位原子性、四个补充用例（缺口超 1024、清理并发、北京零点边界、无成交空洞）；测试/验收指出九点缺口（连续性集合等式、单快照集成证据、清理并发与 WS 410、正常启动语义回归、bars 断言层级、截断前置条件、逐字段核对、complete/as_of_seq、原有行为回归），实测 Docker 可用、go 在 /usr/local/go/bin；数据库/可靠性确认 RR 只读快照足够、指出 flush 两快照间清理洞是真实正确性缺口须加 batch 首条连续性校验、kick+跳位并入单临界区、PrepareSnapshot 落位 httpapi 复用既有读取。分歧两处：flush 是否加防御（开发记限制 vs 数据库席加校验）、SQL 下界 from-24h 去留。
+- 后续轮 · 修订版 v2：Hub !started 分支单临界区（判定+踢+置位同锁，close 留锁外）；flush 每批校验 batch[0].Seq==last+1，不符按 behind 同路径 kick+跳位（开发席第二轮撤回「记限制」立场接受此修订，数据库席枚举五种快照间变化证明防御后仅剩 high 一拍滞后）；PrepareSnapshot 落位 httpapi.Server 复用 begin/head/readEvents，Hub 加注入字段含 nil 回退（生产接线必须配置，回退仅测试/过渡并记移除时点），410/400/409 判定留 Hub，Prepare 返回改结构体带出 retained，ws.go 410 详情改用快照内值；/bars 上界统一取 barWindow(interval,to).End（1m 不特判单一路径）、聚合后 [from,to) 起点过滤不变、响应顶层补 as_of_seq（同事务 head.LastSeq，num() 字符串）、下界 from-24h 本步保留记后续优化；测试计划按测试席九点缺口落地并新增 WS 升级前 400/409 回归，集成执行选直连临时测试库（docker run 一次性 postgres:17 容器、独立匿名卷、POSTGRES_DB=voyage_test，不复用 db-data），命令 /usr/local/go/bin/go vet ./...、go test -race ./...、go test -race -tags=integration ./...；覆盖矩阵先写 RECORD 再实施。产品席条件：S4.5 README 按「现状口径」写 1013 不区分文案（不写成未来代码改进承诺）；开发席条件：hub.go 两处改动保持互不重叠独立代码块便于单独回滚、防御分支不计 OnDBError 只计 OnSlow、behind 分支顺手统一快照模式；测试席条件：union 断言须真实排空通道、behind 与防御判定先后顺序定死各配用例、清理并发二选一写成穷尽判定。待收敛一项：数据库席（新会话实例）第二轮附带提出 complete 判据改查询上界 to，主 Agent 以 DESIGN §10「用快照中的已提交逻辑时间判断收盘」、to 为未来时间时 to 判据会把未收盘标 true 的反例、其余三席均按 simNow 确认（测试席核过 simNow==End→true 边界）交回其确认；其 concern 的组合场景（历史 to 落周期中间、数据完整、complete=true）已由缺口 6/7 用例覆盖。
+- 实施 · 北京时间 17:15 完成，实施方式为主 Agent 协调加并行子 Agent：主 Agent 改 stream/hub.go（PrepareResult 结构体与 PrepareSnapshot 注入含 nil 回退、!started 分支与 behind 分支统一为 resync 单临界区跳位、flush 每批 batch[0].Seq==last+1 防御、删除 kickAll）、httpapi/read.go（PrepareSnapshot 方法单 RR 只读事务复用 begin/head/readEvents、bars SQL 上界改 barWindow(interval,to).End、响应顶层补 as_of_seq）、httpapi/ws.go（PrepareResult 适配、410 详情改用快照内 retained，删除 tx 外二次 Watermark）、cmd/market-simulator/serve.go（一行接线 PrepareSnapshot）。主 Agent 写 stream/hub_test.go 八个单测；两个实施子 Agent 并行写 cmd/market-simulator/bars_integration_test.go 与 stream_prepare_integration_test.go（bars 子 Agent 修正了任务书中两处窗口计算错误：to=10:03 时 10:30 周期被起点过滤须拆两次查询、1d 查询 from 须取 11-17T09:00Z，修正合理已采纳）。hub.go 两处改动（!started 与防御）为互不重叠的独立代码块，满足回滚粒度条件。环境：依赖经 goproxy.cn 补齐模块缓存（pgx v5.13.0、websocket v1.8.15、x/net、x/text，go.sum 原有声明非新增）；postgres:17 镜像重新拉取；一次性测试库容器 voyage-s41-test（--rm 匿名卷、127.0.0.1:55432、voyage_test，口令为占位）。
+- 验证 · 单测：GOPROXY=https://goproxy.cn,direct /usr/local/go/bin/go vet ./... 退出码 0；go test -race ./... 全部 ok（stream 用 -count=3 稳定）。集成（两步标准流程，全量并行时 store 的 TestMigrateIdempotent DROP DATABASE 与 cmd 包竞争 42P01，故分包）：第一步 go test -race -tags=integration ./store/ 退出码 0（2.4s）；第二步 ./cmd/... ./dataset/... ./engine/... ./httpapi/... ./stream/ 全部 ok（cmd 11.98s）。三个目标用例全过：TestQueryAndStream（原有链路不回归）、TestBarsWindowIntegrity、TestStreamPrepareStatuses。曾有一次失败记录：TestFlushMultiBatchContiguous 初版消费协程跟不上投递被慢队列踢（设计行为），Fetch 注入加 5ms 批间停顿后稳定，属用例问题非实现问题。覆盖矩阵（PLAN S4.1 完成标准 → 用例）：prime 失败后已有订阅按协议恢复 → TestFlushNotStartedKicksSubscribers（单测）；连续送达集合等式 → TestKickRecoveryReplayCoversGap（已收∪重连补发==连续全集，单测）；同一只读快照读取边界水位事件 → TestStreamPrepareStatuses 410 用例 details.first_retained_seq 等于快照内值 + 三路并发建连补发连续（集成）+ PrepareSnapshot 单事务结构；与清理并发 → 410 用例、TestFlushBatchGapDefence、TestFlushBehindRetentionKicks；正常启动语义不重推 → TestPrimeStartsAtHighThenPushesForward、TestFlushNotStartedNoSubscribers；[from,to) 起点筛选与 1m 原有行为 → TestBarsWindowIntegrity e；完整周期与 as_of_seq → a 用例（as_of_seq=="7777" 与 simNow 同一 UPDATE）；to 落 5m/日线中间逐字段核对 → a/b 用例（手算常量、极值与收价后置、部分和≠全和）；complete 语义 → a2/b false、d 的 simNow==End 边界 true；410 过期游标原有行为 → TestStreamPrepareStatuses 410 与 assertExpired 均不回归；回退路径与状态码 → TestPrepareLegacyFallbackAndStatuses（400/409/410/503、nil 回退）。测试容器与镜像保留中（voyage-s41-test 未停），收口后停止。
+- 复核 · 四席均按证据复核通过（北京时间 17:42 前陆续返回）。开发独立复跑全部验证（vet 0、race 全绿、集成两步全绿、三个目标用例点名通过），五项重点核对通过并确认 hub.go 六个 hunk 回滚粒度成立。产品确认协议面无变化（410/409/400 码与结构未动、as_of_seq 为纯增量、恢复路径统一 1013）、PLAN S4.5 两项 README 口径已按现状口径落笔、bars 双向断言齐备、S5 依赖不受影响。测试确认九点缺口加 WS 400/409 全部闭环且断言有效（判别用例在旧实现下必挂）、behind 与防御顺序定死、注入点均在测试内部。数据库确认 resync 临界区完整、PrepareSnapshot 事务读序与隔离正确、防御首条即充分的论证成立、410 详情已无 tx 外二次 Watermark，并认定「清理恰在两读之间」经单事务结构消除后无需行为级负例。四席遗留补记：1) store 集成测试另需环境变量 ADMIN_DATABASE_URL（连 postgres 库做 DROP/CREATE），复跑时须与 DATABASE_URL 一并设置，开发席首跑缺此变量失败后补全通过；2) Hub.PrepareSnapshot 的 nil 回退仅为测试与过渡用途，移除时点定为 S4.2 收口时移除或显式决策保留；3) 覆盖矩阵中「与清理并发」的口径为冻结 retained 加单事务结构加 behind/防御双用例的组合论证，真实 Maintain 交叠不可确定性构造，不应读成真实清理并发已实测，真并发清理黑盒用例列为 S4.2 可选增强；4) 测试容器 voyage-s41-test 已于 17:42 停止并随 --rm 清理（ps 计数 0），postgres:17 镜像保留。S4.1 关闭。S4 状态改回进行中，下一步 S4.2。
+
+## 2026-11-18 18:36 · S4.2 评审收敛完成、实施暂停
+
+- 范围 · PLAN 的 S4.2 四个工作面：优雅停止、Compose test profile 集成运行器与真正新进程接续、Smoke 必验断言、Scale 采集工具。按分档配置由开发、产品、测试/验收、数据库/可靠性四席常驻评审。本条只记录两轮评审共识；实施按用户要求暂停，未改任何代码与配置，恢复时以本条共识为实施依据。
+- 第一轮 · 各参席评审观察（按席位分句）：开发认定四处差距属实且 runner 用独立连接 pool.Close 管不到它，指出 Shutdown(10s) 与事务等待串行最坏 20 秒超 Docker 默认 grace、maintain 事务不在等待范围、resume 与停机竞态、re-exec 须防 go test 缓存与 flag 解析坑；产品确认四方向可接受，要求 503 错误码独立成 shutting_down 避免加重 1013 模糊点、generated_at 改毫秒带三个附带确认、Scale 输出补硬件双轨与采样口径、表体积 metrics 为主 psql 佐证；测试核实水位判断确是「或」语义、serve 停止路径不等 runner、generated_at 秒级序列化使 1 秒门槛判定基本由量化噪声决定，给出接续用例不变量断言设计（min(seq>H0)==H0+1 天然无竞态）、优雅停止三场景行为级用例、桩负例要求、运行器三问验收；数据库确认事务最坏≈10 秒截断、commit 超时不等于未提交故「回滚兜底」应改「持久水位判定」、maintain 可继续性有保证但 maintainFailed 是死字段、表体积应按需+TTL 缓存、二代抢锁闪退需编排层重试。无实质分歧，仅落实细节分叉。
+- 后续轮 · 修订版 v2 四席全部确认同一结论：A 优雅停止——停止序列定为「ctx.Done → /v1/stream 新建连返回 503 shutting_down（检查在 Prepare 前、不绑 pause，REST 保持 200，存量 WS 不主动踢、随进程退出自然断，客户端按 1013 重连；DESIGN「关闭 WebSocket」按此解读）→ 等 runner 退出（genDone 在 startGen wrapper 内 conn.Close 之后 close；经 genMu 取当前一次，idle 则跳过；含 maintain goroutine 同 deadline 短等待保证 OnMaintainError 落盘；硬上限 10 秒）→ srv.Shutdown 2 秒（超时 error 忽略）→ pool.Close」；三个 compose 文件（含 compose.full.yaml）market 均加 stop_grace_period 15s；startGen 首行加 ctx.Err() 检查；maintain 改 OnMaintainError 回调挂 Open 与 Maintain 两失败点、带 market_id 与阶段、退出期 ctx 取消降级不告警、日志不打 DSN 与环境变量全集、defer conn.Close 改 Background、删 maintainFailed 死字段；措辞全案用「以数据库持久水位判定接续」；停机期 /readyz 自然转 503 属预期；503 shutting_down 为 DESIGN §12 错误表最小扩展，S4.5 README 补重试口径。B 运行器与接续——compose.yaml 加 profiles:[test] 的 test-db（独立卷、voyage_test）与 integration 运行器（build target=test stage、GOPROXY=off、-count=1、两步分包 store 先、ADMIN_DATABASE_URL 指 /postgres、restart:no），验收含 config 静态隔离、exit 7 退出码回传实测、默认栈不受扰；接续测试用 re-exec（TestServeHelper 调 serveCommand 生产入口、GO_WANT_HELPER_PROCESS 守卫、-- 停 flag、预选端口、SysProcAttr 隔离信号域、Cancel+WaitDelay、独立市场 one-piece-restart）；停稳三重证据硬门（Wait 退出码 0 + pg_try_advisory_lock 同键试探 + 水位两次读相等）；断言 min(seq>H0)==H0+1、min(logical_tick)==T0+1、count==max-H0、旧事件签名逐字相等、recomputeBars 静止后回算、跨代桶条件豁免式断言（两代同分钟才必须计数≥1，T0 mod 60==49 时豁免并 Logf）；优雅停止行为级用例：正常停、事务进行中停两子例（父测试持 market_instances FOR UPDATE：早释放验证等提交[现状必挂判别用例]、死等验证 10 秒上限[退出时限断言 ≤13s、窗口内 WS 新连 503+code、REST /status 200]）、maintain 失败单测（Runner.Open 注入、错误文本造带口令 URL 验脱敏、纯日志行为判定）；B 排 A 之后实施。C Smoke——水位或改且、快照后首条==as_of_seq+1、5 条严格连续、重连首条==断开前最后+1、对照读到 trade 为止、成功打摘要行；verifySmoke 预算参数化（默认 20 秒不变）；桩负例必验：httptest+coder/websocket 单 handler 分发、有状态桩、数字用字符串形态、双模式（normal 自洽 exit 0、defect 非零且 stderr 含预期消息）、三种缺陷（水位只动一项、补发跳首号、重连跳号）、无 integration tag 秒级、scale 首条 defect 变体复用骨架。D Scale——写入直方图窗口起止差值（逐桶含 +Inf、total 差 0 报窗口内无提交、end<start 报窗口内重启、p95 桶上界保守口径）；请求 p95 以 1 RPS GET /status 采样并报样本数与错误数；水位差输出期末值+每客户端 committed−最后收到（读数时机为订阅停止即刻，两锁撕裂小幅负差原样记录、门槛只用追平判定）；表体积经 /metrics 新指标 market_db_table_bytes{table=market_events|bars_1m|instrument_states|instruments}（按需查询+5–15 秒 TTL 缓存+并发去重、r.Context()、失败省略指标行不 5xx、verify 缺行判失败不当 0）；generated_at 改固定 ".000" 三位 layout（read.go 单序列化点、REST/WS 同源、只改 generated_at，event_time 与 server_time 整秒不动）+ 收到帧含 ≥3 位小数断言；scale 首条相对 dial 游标 +1 断言；硬件双轨（verify 输出容器视角 nproc/meminfo/cgroup 并标注、RECORD 由操作者补宿主侧含 WSL2 说明）。另：S4.1 遗留的 PrepareSnapshot nil 回退在本步收口时移除，取 fail fast（nil 即启动失败），hub 单测改注入式并加 nil 启动失败单测。
+- 实施 · 未开始。北京时间 18:36 用户要求全部暂停并做好记录。恢复后实施顺序按共识：A（主路径 serve/runner/httpapi/compose×3）→ C 与 D 并行 → B（依赖 A）→ 全量验证（vet、race 单测、两步集成、桩负例）→ 四席复核。S4.1 的代码与文档修改仍在工作区未提交（用户此前要求暂存不提交，尚未执行 git add）。
+- 验证 · 本条无命令执行。无后台任务在跑：四席评审均已在 18:36 前返回结论；测试容器与镜像状态以 S4.1 收口记录为准（容器已删、镜像保留）。
+- 复核 · 不适用（未实施）。恢复实施完成后由四席按证据复核。

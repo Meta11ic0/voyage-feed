@@ -25,6 +25,10 @@ func (s *Sub) Chan() <-chan Message { return s.ch }
 type Hub struct {
 	Fetch     func(ctx context.Context, after, until int64, limit int) ([]Message, error)
 	Watermark func(ctx context.Context) (high, retained int64, err error)
+	// PrepareSnapshot 在同一只读快照内读取高水位、保留边界和补发事件，limit 传入
+	// 实际接收上限加一（多取一条用于判断缺口超限）。生产接线必须设置；为 nil 时
+	// Prepare 回退到 Watermark 与 Fetch 两次读取，仅用于测试和过渡。
+	PrepareSnapshot func(ctx context.Context, after int64, limit int) (high, retained int64, msgs []Message, err error)
 	Notify    chan struct{}
 	OnDBError func()
 	OnSlow    func()
@@ -32,6 +36,17 @@ type Hub struct {
 	subs      map[*Sub]struct{}
 	last      int64
 	started   bool
+}
+
+// PrepareResult 是建连补发的结果：成功时 Status 为 0，Sub 与 Replay 可用；
+// 410 时 Retained 为快照内保留边界，用于向客户端说明可续订起点。
+type PrepareResult struct {
+	Sub      *Sub
+	High     int64
+	Retained int64
+	Replay   []Message
+	Status   int
+	Err      error
 }
 
 func NewHub() *Hub {
@@ -50,33 +65,48 @@ func (h *Hub) Last() int64 {
 	return h.last
 }
 
-func (h *Hub) Prepare(ctx context.Context, after int64) (*Sub, int64, []Message, int, error) {
+func (h *Hub) Prepare(ctx context.Context, after int64) PrepareResult {
 	item := &Sub{ch: make(chan Message, QueueLimit), slow: make(chan struct{})}
 	h.mu.Lock()
 	h.subs[item] = struct{}{}
 	h.mu.Unlock()
-	fail := func(status int, err error) (*Sub, int64, []Message, int, error) {
+	fail := func(status int, err error) PrepareResult {
 		h.remove(item)
-		return nil, 0, nil, status, err
+		return PrepareResult{Status: status, Err: err}
 	}
-	high, retained, err := h.Watermark(ctx)
-	if err != nil {
-		return fail(503, err)
+	var high, retained int64
+	var replay []Message
+	if h.PrepareSnapshot != nil {
+		var err error
+		high, retained, replay, err = h.PrepareSnapshot(ctx, after, QueueLimit+1)
+		if err != nil {
+			return fail(503, err)
+		}
+	} else {
+		var err error
+		high, retained, err = h.Watermark(ctx)
+		if err != nil {
+			return fail(503, err)
+		}
 	}
 	if after < retained-1 {
-		return fail(410, nil)
+		h.remove(item)
+		return PrepareResult{Retained: retained, Status: 410}
 	}
 	if after > high {
 		return fail(400, nil)
 	}
-	replay, err := h.Fetch(ctx, after, high, QueueLimit+1)
-	if err != nil {
-		return fail(503, err)
+	if h.PrepareSnapshot == nil {
+		var err error
+		replay, err = h.Fetch(ctx, after, high, QueueLimit+1)
+		if err != nil {
+			return fail(503, err)
+		}
 	}
 	if len(replay) > QueueLimit {
 		return fail(409, nil)
 	}
-	return item, high, replay, 0, nil
+	return PrepareResult{Sub: item, High: high, Replay: replay}
 }
 
 func (h *Hub) remove(item *Sub) {
@@ -136,19 +166,18 @@ func (h *Hub) flush(ctx context.Context) {
 		}
 		h.mu.Lock()
 		last := h.last
-		if !h.started {
-			h.last = high
-			h.started = true
-			h.mu.Unlock()
+		started := h.started
+		h.mu.Unlock()
+		if !started {
+			// prime 未成功（数据库故障）后首次读到水位：对齐到当前高水位，
+			// 不重推全部历史。窗口内已有订阅时，跳位会漏发其补发基线之后的
+			// 已提交事件，按协议断开，由客户端用最后连续消费序号重连续读。
+			h.resync(high)
 			return
 		}
-		behind := last+1 < retained
-		h.mu.Unlock()
-		if behind {
-			h.kickAll()
-			h.mu.Lock()
-			h.last = high
-			h.mu.Unlock()
+		if last+1 < retained {
+			// 缺口起点已被保留期清理，无法继续补发，断开重连。
+			h.resync(high)
 			return
 		}
 		if high <= last {
@@ -162,6 +191,12 @@ func (h *Hub) flush(ctx context.Context) {
 			return
 		}
 		if len(batch) == 0 {
+			return
+		}
+		if batch[0].Seq != last+1 {
+			// 水位与事件两次读取之间发生了清理等变化，批次起点不连续。
+			// 静默投递会漏发这段已提交事件，按协议断开并重新对齐。
+			h.resync(high)
 			return
 		}
 		var slow []*Sub
@@ -199,15 +234,20 @@ func (h *Hub) flush(ctx context.Context) {
 	}
 }
 
-func (h *Hub) kickAll() {
+// resync 在同一临界区内把分发游标跳到 high 并断开全部现有订阅的注册，
+// 锁外再关闭 slow 通道通知断开。用于首次对齐、保留边界越过和批次不连续
+// 三种无法继续补发的场景。
+func (h *Hub) resync(high int64) {
 	h.mu.Lock()
-	all := make([]*Sub, 0, len(h.subs))
+	h.last = high
+	h.started = true
+	kicked := make([]*Sub, 0, len(h.subs))
 	for one := range h.subs {
-		all = append(all, one)
+		kicked = append(kicked, one)
 	}
 	h.subs = map[*Sub]struct{}{}
 	h.mu.Unlock()
-	for _, one := range all {
+	for _, one := range kicked {
 		select {
 		case <-one.slow:
 		default:

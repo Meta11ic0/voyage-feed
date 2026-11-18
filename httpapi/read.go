@@ -336,11 +336,14 @@ func (s *Server) bars(w http.ResponseWriter, r *http.Request) {
 		writeError(w, http.StatusNotFound, "not_found", "标的不存在", nil)
 		return
 	}
+	// 查询上界扩展到 to 所在周期的结束点，保证聚合周期内分钟线完整；
+	// 由此聚合出的周期若起点落在 [from,to) 之外，由下方过滤排除。
+	_, upper, _ := barWindow(interval, to)
 	rows, err := tx.Query(r.Context(), `
 		SELECT bucket_start, open_cents, high_cents, low_cents, close_cents, volume, turnover_cents, trade_count
 		FROM bars_1m
 		WHERE market_id = $1 AND instrument_id = $2 AND bucket_start >= $3 AND bucket_start < $4
-		ORDER BY bucket_start`, s.MarketID, instrument, from.Add(-24*time.Hour), to)
+		ORDER BY bucket_start`, s.MarketID, instrument, from.Add(-24*time.Hour), upper)
 	if err != nil {
 		s.failDB(w, err)
 		return
@@ -375,7 +378,7 @@ func (s *Server) bars(w http.ResponseWriter, r *http.Request) {
 		writeError(w, http.StatusBadRequest, "bad_range", "请缩窄范围", nil)
 		return
 	}
-	writeJSON(w, http.StatusOK, map[string]any{"items": items})
+	writeJSON(w, http.StatusOK, map[string]any{"as_of_seq": num(head.LastSeq), "items": items})
 }
 
 func (s *Server) sectors(w http.ResponseWriter, r *http.Request) {
@@ -531,6 +534,25 @@ func (s *Server) Fetch(ctx context.Context, after, until int64, limit int) ([]st
 	}
 	defer tx.Rollback(ctx)
 	return s.readEvents(ctx, tx, after, until, limit)
+}
+
+// PrepareSnapshot 在同一只读快照内读取高水位、保留边界和补发事件，
+// 避免与保留期清理并发时水位与事件不一致。limit 由调用方传入接收上限加一。
+func (s *Server) PrepareSnapshot(ctx context.Context, after int64, limit int) (int64, int64, []stream.Message, error) {
+	tx, err := s.begin(ctx)
+	if err != nil {
+		return 0, 0, nil, err
+	}
+	defer tx.Rollback(ctx)
+	head, err := s.head(ctx, tx)
+	if err != nil {
+		return 0, 0, nil, err
+	}
+	msgs, err := s.readEvents(ctx, tx, after, head.LastSeq, limit)
+	if err != nil {
+		return 0, 0, nil, err
+	}
+	return head.LastSeq, head.Retained, msgs, nil
 }
 
 func (s *Server) Watermark(ctx context.Context) (int64, int64, error) {
