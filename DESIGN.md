@@ -88,7 +88,7 @@ v0.1 只部署行情进程和数据库。进程里可以用不同的 goroutine �
 ### 4.2 每步生成
 
 1. 按稳定的标的 ID 顺序遍历标的。每只标的独立抽取是否成交，示例配置为每秒 2% 的概率。这会产生标的间自然的疏密差异，首版对所有标的使用同一概率。
-2. 对将成交的标的，从对称区间均匀抽取整数基点变化，示例为 `-20…+20 bps`。按 `上一有效价格 × (1 + 变动基点 ÷ 10,000)` 计算候选价，再按最小价位四舍五入。候选价超出第 10.3 节的正价范围时，这一步不生成该标的成交。舍入后价格没变时，仍可生成一笔平价成交。
+2. 对将成交的标的，从对称区间均匀抽取整数基点变化，示例为 `-20…+20 bps`。按 `上一有效价格 × (1 + 变动基点 ÷ 10,000)` 计算候选价，再按最小价位取整；取整规则以模型版本区分，`random-v2` 起对有符号增量采用半分取偶（恰为半分时取偶邻位），保证对称基点区间下取整幅值相等、方向相反，任意价位单步取整增量的期望为零；`random-v1` 沿用正数域就近向上取整（历史市场行为不变）。候选价超出第 10.3 节的正价范围时，这一步不生成该标的成交。舍入后价格没变时，仍可生成一笔平价成交。
 3. 成交数量独立抽样，示例为随机 1–10 手，每手 100 股。逐笔事件记录成交价格、股数和模拟时间。没有成交的标的继续沿用有效价格，成交量和成交额保持原值。
 4. 每次抽样由 `市场种子 + 模型版本 + 标的 ID + 逻辑步 + 抽样用途` 确定。三个用途分别为成交、变价与数量。固定版本和种子可以重现行情，同一逻辑步因故障重做时抽样一致。
 
@@ -244,7 +244,7 @@ REST 路径以 `/v1/markets/{market_id}` 为前缀。时间按模拟事件时间
 
 - 对章节数 `c`，用 `floor((1 + ln(1 + c)) × 1000000 + 0.5)` 得整数权重；缺失使用 `1000000`。分给每只股票的目标市值是 `floor(总预算分值 × 权重 / 权重总和)`，乘积使用 `math/big.Int` 或数据库 `numeric`，然后按第 3 节计算股数。价格区间沿用第 3 节的示例，下界与上界都包含，换算成整数分后抽取。
 - 版本名 `random-v1`。按 `模型版本、种子十进制、标的 ID、逻辑步十进制、用途、重试编号十进制` 顺序以换行拼接，采用 UTF-8 和 SHA-256。取摘要前八字节作大端无符号整数，每次重试编号从 0 递增。为在 `[0,n)` 上均匀抽样，拒绝小于 `2^64 mod n` 的值，对接受的值取模；实现用 `uint64(0)-n` 的回绕计算余数。不同用途分别为 `initial_price`、`trade_gate`、`move_bps`、`quantity_lots`。初始价逻辑步固定为 0。
-- `trade_gate` 在 `[0,10000)` 抽样，严格小于成交概率时继续。`move_bps` 在 `[0,2M+1)` 抽样后减 `M`。数量用 `1 + rand(10)` 手，每手 100 股。价格使用整数算式 `(上一价分值 × (10000 + 基点) + 5000) / 10000`，正数整数除法取整。候选低于 1 分或高于 `100000000` 分时跳过该笔。价格、数量和单标的日内金额在配置上限内用 `int64`，超范围报错并回滚当步。板块和市场总额用数据库 `numeric` 或应用大整数。
+- `trade_gate` 在 `[0,10000)` 抽样，严格小于成交概率时继续。`move_bps` 在 `[0,2M+1)` 抽样后减 `M`。数量用 `1 + rand(10)` 手，每手 100 股。价格取整按市场行的 `model_version` 分派。`random-v2` 起，价格增量 Δ 对 `上一价分值 × 基点 ÷ 10000` 按「最近分位、恰半分时取偶邻位」取整（整数实现：q、r 为 `上一价分值 × 基点` 对 10000 的截断商与余，`|r| = 5000` 时在两邻位中取偶数者，`2|r| > 10000` 远离零进一，否则取 q；`下一价 = 上一价分值 + Δ`），因对称基点区间下 ±b 的平局点取整幅值相等、方向相反，任意价位恒有 E[Δ]≡0，无系统性漂移；残余效应仅为平局落点偏向偶数分价位的奇偶纹理，对收益率分布一阶无影响。`random-v1` 市场沿用整数算式 `(上一价分值 × (10000 + 基点) + 5000) / 10000`，正数整数除法取整，以保旧市场重放链；未知版本明确拒绝。候选低于 1 分或高于 `100000000` 分时跳过该笔。价格、数量和单标的日内金额在配置上限内用 `int64`，超范围报错并回滚当步。板块和市场总额用数据库 `numeric` 或应用大整数。
 - 市场创建时 `logical_tick=0`、`last_event_seq=0`。首次推进为步 1，模拟时间为 `clock_origin + logical_tick 秒`。每日按 UTC+08:00 切分，开跑当天直接进入连续交易。零成交时只推进时钟。跨日用一条 `session` 事件表示进入新日，其序号早于同一逻辑步的成交。
 
 ## 11. 持久化与进程内协作契约
@@ -282,12 +282,14 @@ REST 路径以 `/v1/markets/{market_id}` 为前缀。时间按模拟事件时间
 | `GET /status` | `market_id, dataset_id, model_version, market_date, event_time, server_time, logical_tick, last_event_seq, first_retained_seq, state`。状态为 `running` 或 `paused`。时钟暂停但可读数据库时仍可查询历史 |
 | `GET /instruments` | 参数 `after_symbol` 可选，从字典序严格大于该值的位置分页。`limit` 默认 100、最大 1000。返回 `items,next_after_symbol`，最后一页游标为 null。条目使用第 10 节发布字段并附发行数据、参考价和实际初始总市值 |
 | `GET /snapshot` | 可选 `symbol` 或 `sector` 做精确过滤，响应 `market_id, market_date, event_time, as_of_seq, items`。每项返回 `symbol,name,sector,initial_price_cents,prev_close_cents,last_price_cents,last_trade_time,open_cents,high_cents,low_cents,volume,turnover_cents,change_pct`。无成交时展示有效价可用初始价，日内 OHLC 返回 null |
-| `GET /events` | `after_seq` 默认 `0`，返回其后事件。`until_seq` 默认当前高水位，显式上界取请求值和高水位的较小者。`limit` 默认 1000、最大 5000。响应 `items,until_seq,next_after_seq,has_more`，客户端翻页沿用返回的上界。当前保留最早序号之前的游标返回 410，正好等于 `first_retained_seq - 1` 可读 |
-| `GET /bars` | 参数 `symbol` 必填，周期只接收 `1m,5m,1d`，默认 `1m`。`to` 默认当前模拟时间后一秒，`from` 默认 `to - 24 小时`。范围最长 30 天，按 K 线起始时间过滤，最多 2000 根，超限返回 400 并提示缩窄范围。用已提交时间作水位，未来的 `to` 不会生成未来数据。返回 `items`，每个元素含 `start_time,end_time,open_cents,high_cents,low_cents,close_cents,volume,turnover_cents,trade_count,complete` |
+| `GET /events` | `after_seq` 默认 `0`，返回其后事件。`until_seq` 默认当前高水位，显式上界取请求值和高水位的较小者，晚于已提交序号返回 400；`after_seq` 晚于高水位时返回空页。`limit` 默认 1000、最大 5000。响应 `items,until_seq,next_after_seq,has_more`，客户端翻页沿用返回的上界。`has_more` 只表示固定查询窗口内还有下一页，不构成追平信号；`has_more=false` 时新提交的事件对本窗口不可见，追平以再次请求或水位为准。当前保留最早序号之前的游标返回 410，正好等于 `first_retained_seq - 1` 可读 |
+| `GET /bars` | 参数 `symbol` 必填，周期只接收 `1m,5m,1d`，默认 `1m`。`to` 默认当前模拟时间后一秒，`from` 默认 `to - 24 小时`。范围最长 30 天，按 K 线起始时间过滤，最多 2000 根，超限返回 400 并提示缩窄范围。用已提交时间作水位，未来的 `to` 不会生成未来数据。返回 `items`，每个元素含 `start_time,end_time,open_cents,high_cents,low_cents,close_cents,volume,turnover_cents,trade_count,complete`。`complete=false` 的 bar 属未完周期，后续请求可能改写其全部字段，消费者不得缓存为最终值；`complete=true` 后不变。首版失效手段为轮询；`event_time` 随序号单调不降，任一业务事件 `event_time` 不早于周期结束即该周期定版，消费者可据此自行推导封版 |
 | `GET /sectors` | 响应 `as_of_seq, items, market`。板块条目含 `sector,float_cap_cents,change_pct,up,down,flat,no_trades`，`market` 用同一公式计算全市场。按板块名称排序。无当日成交的标的计入 `no_trades` |
-| `WebSocket /v1/stream` | URL 必填 `market_id` 与 `after_seq`。市场和游标在升级连接前验证。只发全市场事件。连接每 5 秒发 JSON 心跳，发送超时为 3 秒，WebSocket ping 每 15 秒、pong 超时 5 秒。连接保持只读，拒收客户端业务消息 |
+| `WebSocket /v1/stream` | URL 必填 `market_id` 与 `after_seq`。市场和游标在升级连接前验证，晚于已提交序号返回 400。只发全市场事件。连接每 5 秒发 JSON 心跳，发送超时为 3 秒，WebSocket ping 每 15 秒、pong 超时 5 秒。连接保持只读，拒收客户端业务消息。默认拒绝跨域 Origin（依赖 websocket 库默认行为），放开 OriginPatterns 视为协议变更需评审 |
 
 接口错误统一为 `{"error":{"code":"cursor_expired","message":"游标早于可查询范围","details":{"first_retained_seq":"1200"}}}` 结构。400 用于格式、范围或未来游标，404 用于未知市场或标的，409 用于实时续订积压超过 1024 条并引导客户端先走历史接口，410 用于保留期缺口，503 用于数据库或订阅容量不可用。统一 JSON `Content-Type`，错误中不回显原始数据库连接信息。只支持同源浏览器连接及本地程序访问。
+
+三种时间的分工：`event_time` 为模拟世界事件时间（整秒，随 `logical_tick` 单调）；`generated_at` 为服务端提交时刻（墙钟，毫秒小数）；`server_time` 为心跳与状态帧的墙钟，与 `generated_at` 同源。链路延迟与滞后统计一律以 `generated_at` 为准，`event_time` 与 `generated_at` 之差是模拟时间膨胀的产物，禁止当作延迟；心跳的 `last_event_seq` 是提交水位，可领先订阅端实收，仅作高水位提示，不表示推送进度。
 
 WebSocket 升级前先在分发器注册连接并开始缓存，在读事务中获取高水位 `H`，按序读齐 `(after_seq,H]`，并确认尾段未超上限。升级后第一帧 `{"type":"subscribed","market_id":"one-piece-dev","replay_until_seq":"1212"}`，然后依次发送历史和缓冲流，丢弃所有序号小于等于 H 的缓冲事件。客户端每次只以最后连续消费的业务序号续订。心跳不分配事件序号，含已提交的 `last_event_seq, logical_tick, server_time`。发送队列溢出使用关闭码 1013，客户端走历史补齐后重连。发现正在使用的分发序号已经低于保留边界时，断开其订阅并重置分发游标，客户端重新拉快照。
 
@@ -301,7 +303,7 @@ WebSocket 升级前先在分发器注册连接并开始缓存，在读事务中�
 4. 运行容器测试。`Dockerfile` 提供 `test` 构建阶段执行 `go vet ./...` 和 `go test -race ./...`。Compose 增设只在 profile `test` 启动的测试运行器，使用独立测试数据库，执行集成测试。`verify` 可在运行镜像中从 HTTP 及 WebSocket 验证真实部署。
 5. 构建正式标的发布文件并运行全量验收。合成压力数据用于验证规模与分发，正式数据报告用于确认角色覆盖和资料来源，两项都要写入实施结果。质量门槛为可核验的命令输出和失败说明。任何必验项失败须定位并修复后重跑，数据源不可获取时按第 10.2 节记录发布缺口。
 
-同时交付独立的 `compose.scale.yaml`。压力市场固定为 `one-piece-scale`，Compose 项目名固定为 `market-simulator-scale`，宿主端口用 8788，仍只绑定回环地址。合成数据由构建过程生成，规模固定为 1,500 个标的。正式数据使用独立的 `compose.full.yaml`，项目名固定为 `market-simulator-full`，市场为 `one-piece-c1198-v1`，回环端口 8789。把 `./data/release/one-piece.json` 只读挂载为 `/app/data/one-piece.json` 并指定 `DATASET_PATH`。正式和压力市场都使用默认 2% 成交概率。测试命令仅操作各自的卷。
+同时交付独立的 `compose.scale.yaml`。压力市场固定为 `one-piece-scale`，Compose 项目名固定为 `market-simulator-scale`，宿主端口用 8788，仍只绑定回环地址。合成数据由构建过程生成，规模固定为 1,500 个标的。正式数据使用独立的 `compose.full.yaml`，项目名固定为 `market-simulator-full`，市场为 `one-piece-c1198-v2`，回环端口 8789。把 `./data/release/one-piece.json` 只读挂载为 `/app/data/one-piece.json` 并指定 `DATASET_PATH`。正式和压力市场都使用默认 2% 成交概率。测试命令仅操作各自的卷。
 
 文档中规定将来实现后的本机验收命令。测试从模拟系统目录执行。
 
@@ -323,7 +325,7 @@ docker compose -p market-simulator-scale -f compose.scale.yaml down
 go run ./cmd/market-simulator dataset fetch --out-dir data/raw
 go run ./cmd/market-simulator dataset build --characters data/raw/characters.html --appearances data/raw/appearances.csv --rankings data/raw/rankings.html --source-manifest data/raw/sources.json --cutoff-chapter 1198 --overrides data/overrides.json --out data/release/one-piece.json
 docker compose -p market-simulator-full -f compose.full.yaml up -d --build --wait
-docker compose -p market-simulator-full -f compose.full.yaml exec -T market /app/market-simulator verify --base-url http://127.0.0.1:8787 --market one-piece-c1198-v1 --profile smoke
+docker compose -p market-simulator-full -f compose.full.yaml exec -T market /app/market-simulator verify --base-url http://127.0.0.1:8787 --market one-piece-c1198-v2 --profile smoke
 ~~~
 
 | 验收入口 | 机械判定 |

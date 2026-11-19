@@ -74,7 +74,7 @@ services:
       test-db:
         condition: service_healthy
     restart: "no"
-    command: ["bash", "-lc", "set -euo pipefail; go test -race -count=1 -tags=integration ./store/; go test -race -count=1 -tags=integration ./cmd/market-simulator/ ./dataset/ ./engine/ ./httpapi/ ./stream/"]
+    command: ["bash", "-c", "set -euo pipefail; go test -race -count=1 -tags=integration ./store/; go test -race -count=1 -tags=integration ./cmd/market-simulator/ ./dataset/ ./engine/ ./httpapi/ ./stream/"]
 
 volumes:
   db-data:

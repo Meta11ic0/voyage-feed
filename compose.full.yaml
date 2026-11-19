@@ -22,7 +22,7 @@ services:
     environment:
       DATABASE_URL: postgres://voyage:${POSTGRES_PASSWORD:-voyage-dev}@db:5432/voyage?sslmode=disable
       HTTP_ADDR: ":8787"
-      MARKET_ID: one-piece-c1198-v1
+      MARKET_ID: one-piece-c1198-v2
       DATASET_PATH: /app/data/one-piece.json
       MARKET_SEED: "7"
       TICK_INTERVAL_MS: "1000"
@@ -40,7 +40,7 @@ services:
       db:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "/app/market-simulator", "verify", "--base-url", "http://127.0.0.1:8787", "--market", "one-piece-c1198-v1", "--profile", "ready"]
+      test: ["CMD", "/app/market-simulator", "verify", "--base-url", "http://127.0.0.1:8787", "--market", "one-piece-c1198-v2", "--profile", "ready"]
       interval: 5s
       timeout: 3s
       retries: 20
